@@ -77,7 +77,7 @@ public class USERS {
         //System.out.printf("%s %s %s %s %s %s",UserData[0],UserData[1],UserData[2],UserData[3],UserData[4],UserData[5]);
         SQLx.Insertx("USERS",UserData);
         if(flag) SignUpMgr(UserData[0]);
-        else mypage(UserData[0]);
+        else SignUpMem(UserData[0]);
         System.out.println("----------------------------------------------------");
         System.out.printf("Your ID_NUMBER is %s\n", UserData[0]);
         bf.close();
@@ -130,7 +130,9 @@ public class USERS {
         else {
             StringBuilder where = new StringBuilder();
             where.append("ID_NUMBER = "+apx+idps[0]+apx);
-            if(SQLx.Selectx("ID_NUMBER", "MANAGER", where.toString(), "").getRow() == 1){
+            ResultSet rs = SQLx.Selectx("ID_NUMBER", "MEMBER", where.toString(), "");
+            rs.last();
+            if(rs.getRow() == 1){
                 System.out.println("----------------------------------------------------");
                 System.out.println("Manager Screen");
                 while (true){
@@ -151,7 +153,7 @@ public class USERS {
                     }
                 }
             }
-            else if(SQLx.Selectx("ID_NUMBER", "MEMBER", where.toString(), "").getRow() == 1){
+            else if(rs.getRow() == 1){
                 System.out.println("----------------------------------------------------");
                 System.out.println("User Screen");
                 while (true){
@@ -179,7 +181,7 @@ public class USERS {
                     System.out.println("1. Member, 2. Manager, 3. Quit");
                     System.out.print("Enter the number : ");
                     int role = Integer.parseInt(bf.readLine());
-                    if(role == 1) mypage(idps[0]);
+                    if(role == 1) SignUpMem(idps[0]);
                     else if (role == 2) SignUpMgr(idps[0]);
                     else if (role == 3) System.exit(0);
                     else {
@@ -204,7 +206,7 @@ public class USERS {
         SQLx.Insertx("MANAGER", data);
         bf.close();
     }
-    private static void mypage(String ID) throws SQLException {
+    private static void SignUpMem(String ID) throws SQLException {
         String[] data = new String[2];
         data[0] = ID;
         data[1] = "0";

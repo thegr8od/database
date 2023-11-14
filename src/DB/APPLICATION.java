@@ -17,21 +17,28 @@ public class APPLICATION {
             System.out.println("----------------------------------------------------");
             System.out.print("Enter the number: ");
 
+
             try {
                 int opt = Integer.parseInt(bf.readLine());
                 switch (opt) {
                     case 1:
+                        System.out.println("----------------------------------------------------");
                         System.out.println("Choose an option to update:");
                         System.out.println("1. Password");
                         System.out.println("2. Sex");
                         System.out.println("3. Year of Birth");
                         System.out.println("4. Job");
+                        System.out.println("----------------------------------------------------");
+                        System.out.print("select your choice (1-4): ");
                         int changeOption = Integer.parseInt(bf.readLine());
-                        System.out.print("Enter your choice (1-4): ");
+
+
                         String newValue1, newValue2;
                         do {
+                            System.out.println("----------------------------------------------------");
                             System.out.print("Enter the new value for the chosen option: ");
                             newValue1 = bf.readLine();
+                            System.out.println("----------------------------------------------------");
                             System.out.print("Re-enter the new value to confirm: ");
                             newValue2 = bf.readLine();
                             //무결성 처리 해야함
@@ -42,18 +49,24 @@ public class APPLICATION {
                         ChangeMyInfo(id, changeOption, newValue1);
                         break;
                     case 2:
+                        System.out.println("----------------------------------------------------");
                         System.out.print("Enter the amount to charge: ");
                         try {
                             int amount = Integer.parseInt(bf.readLine());
                             CashCharge(id, amount);
+                            System.out.println("----------------------------------------------------");
                             System.out.println("Charge completed successfully.");
                         } catch (NumberFormatException e) {
+                            System.out.println("----------------------------------------------------");
                             System.out.println("Invalid input. Please enter a valid number.");
                         }
                         break;
                     case 3:
+                        System.out.println("----------------------------------------------------");
                         System.out.println("Are you sure you want to delete your account? Type 'I want to delete my account' to confirm.");
+                        System.out.println("----------------------------------------------------");
                         String confirmation = bf.readLine();
+                        System.out.print("Type : ");
                         if ("I want to delete my account".equals(confirmation)) {
                             Secession(id);
                             System.out.println("Your account has been successfully deleted.");

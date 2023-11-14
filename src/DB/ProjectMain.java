@@ -8,6 +8,14 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
+
 public class ProjectMain {
     // Commons
     public static final String URL = "jdbc:oracle:thin:@localhost:1521:orcl";
@@ -37,7 +45,7 @@ public class ProjectMain {
         }
 
         conn.setAutoCommit(false);
-        //stmt = conn.createStatement();
+        stmt = conn.createStatement();
         System.out.println("------------------------------");
         System.out.println("Hello, Welcome to SoccerLink");
         while (true){
