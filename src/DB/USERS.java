@@ -6,8 +6,7 @@ import java.util.Random;
 
 public class USERS {
     private static final char apx = '\'';
-    protected static void SignUp() throws IOException, SQLException {
-        BufferedReader bf = new BufferedReader(new InputStreamReader(System.in));
+    protected static void SignUp(BufferedReader bf) throws IOException, SQLException {
         System.out.println("----------------------------------------------------");
         System.out.print("Sign Up\n");
         System.out.println("----------------------------------------------------");
@@ -76,14 +75,12 @@ public class USERS {
         }
         //System.out.printf("%s %s %s %s %s %s",UserData[0],UserData[1],UserData[2],UserData[3],UserData[4],UserData[5]);
         SQLx.Insertx("USERS",UserData);
-        if(flag) SignUpMgr(UserData[0]);
+        if(flag) SignUpMgr(UserData[0], bf);
         else SignUpMem(UserData[0]);
         System.out.println("----------------------------------------------------");
         System.out.printf("Your ID_NUMBER is %s\n", UserData[0]);
-        bf.close();
     }
-    protected static void LogIn() throws IOException, SQLException {
-        BufferedReader bf = new BufferedReader(new InputStreamReader(System.in));
+    protected static void LogIn(BufferedReader bf) throws IOException, SQLException {
         StringBuilder where = new StringBuilder();
         String[] idps = new String[2];
         System.out.println("----------------------------------------------------");
@@ -100,11 +97,9 @@ public class USERS {
             rs.last();
             rows = rs.getRow();
         } while (rows != 1);
-        AfterLogIn(idps);
-        bf.close();
+        AfterLogIn(idps, bf);
     }
-    private static void AfterLogIn(String[] idps) throws SQLException, IOException {
-        BufferedReader bf = new BufferedReader(new InputStreamReader(System.in));
+    private static void AfterLogIn(String[] idps, BufferedReader bf) throws SQLException, IOException {
         if(idps[0].equals("SOCCERLINK") && idps[1].equals("ADMIN!")){
             System.out.println("----------------------------------------------------");
             System.out.println("Admin Screen for management");
@@ -182,7 +177,7 @@ public class USERS {
                     System.out.print("Enter the number : ");
                     int role = Integer.parseInt(bf.readLine());
                     if(role == 1) SignUpMem(idps[0]);
-                    else if (role == 2) SignUpMgr(idps[0]);
+                    else if (role == 2) SignUpMgr(idps[0], bf);
                     else if (role == 3) System.exit(0);
                     else {
                         System.out.println("Wrong number!, Re-enter");
@@ -194,8 +189,7 @@ public class USERS {
             }
         }
     }
-    private static void SignUpMgr(String ID) throws IOException, SQLException {
-        BufferedReader bf = new BufferedReader(new InputStreamReader(System.in));
+    private static void SignUpMgr(String ID, BufferedReader bf) throws IOException, SQLException {
         System.out.println("----------------------------------------------------");
         System.out.println("Sign up : Manager page, Insert your Account Number");
         System.out.println("----------------------------------------------------");
@@ -204,7 +198,6 @@ public class USERS {
         data[0] = ID;
         data[1] = bf.readLine();
         SQLx.Insertx("MANAGER", data);
-        bf.close();
     }
     private static void SignUpMem(String ID) throws SQLException {
         String[] data = new String[2];

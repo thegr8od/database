@@ -8,14 +8,6 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
-
 public class ProjectMain {
     // Commons
     public static final String URL = "jdbc:oracle:thin:@localhost:1521:orcl";
@@ -23,6 +15,7 @@ public class ProjectMain {
     public static final String USER_PASSWD = "hr";
     public static Connection conn = null;
     public static Statement stmt = null;
+    public static BufferedReader bf = new BufferedReader(new InputStreamReader(System.in));
     public static void main(String[] args) throws IOException, SQLException {
 
         //jdbc 드라이버 불러오기
@@ -49,7 +42,6 @@ public class ProjectMain {
         System.out.println("------------------------------");
         System.out.println("Hello, Welcome to SoccerLink");
         while (true){
-            BufferedReader bf= new BufferedReader(new InputStreamReader(System.in));
             System.out.println("------------------------------");
             System.out.println("Select Option");
             System.out.println("1. Log In");
@@ -61,8 +53,8 @@ public class ProjectMain {
             int mainOpt = Integer.parseInt(bf.readLine());
             boolean flag = false;
             switch (mainOpt) {
-                case 1 : USERS.LogIn(); break;
-                case 2 : USERS.SignUp(); break;
+                case 1 : USERS.LogIn(bf); break;
+                case 2 : USERS.SignUp(bf); break;
                 case 3 : Credits(); break;
                 case 4 : flag = true; break;
                 default: System.out.println("Wrong number!, Re-enter");
@@ -71,7 +63,9 @@ public class ProjectMain {
         }
         conn.close();
         stmt.close();
+        bf.close(); // BufferedReader를 마지막에 닫음
     }
+
     private static void Credits() throws IOException {
         BufferedReader bf = new BufferedReader(new InputStreamReader(System.in));
         System.out.println("-----------------------------------");
@@ -88,7 +82,7 @@ public class ProjectMain {
         System.out.println(" 2023 Fall Semester, Kyungpook National University");
         System.out.println("--------------------------------------------------------------------------");
         System.out.println(" Press Enter to return Main Screen");
+        System.out.println(" Press Enter to return Main Screen");
         bf.readLine();
-        bf.close();
     }
 }
