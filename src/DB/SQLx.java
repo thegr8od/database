@@ -4,6 +4,7 @@ import javax.xml.transform.Result;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 public class SQLx {
     private static final char apx = '\'';
@@ -12,6 +13,7 @@ public class SQLx {
     private static final String rparen = ") ";
     protected static void Insertx(String tbl, String[] data) throws SQLException {
         StringBuilder sb = new StringBuilder();
+        Statement stmt = ProjectMain.conn.createStatement();
         String sql = "";
         sb.append("INSERT INTO ").append(tbl);
         sb.append(" VALUES ");
@@ -75,15 +77,6 @@ public class SQLx {
             sb.append(apx+data[0]+apx+comma);
             sb.append(apx+data[1]+apx+rparen);
         }
-        else if(tbl.equals("TRAIN_REG")){
-            sb.append(lparen);
-            sb.append(apx+data[0]+apx+comma);
-            sb.append(apx+data[1]+apx+comma);
-            sb.append(apx+data[2]+apx+comma);
-            sb.append(apx+data[3]+apx+comma);
-            sb.append(data[4]+comma);
-            sb.append(data[5]+rparen);
-        }
         else if(tbl.equals("MATCH")){
             sb.append(lparen);
             sb.append(apx+data[0]+apx+comma);
@@ -98,24 +91,19 @@ public class SQLx {
             sb.append(apx+data[2]+apx+comma);
             sb.append(data[3]+rparen);
         }
-        else if(tbl.equals("MATCH_APP_MANAGER")){
-            sb.append(lparen);
-            sb.append(apx+data[1]+apx+comma);
-            sb.append(apx+data[2]+apx+comma);
-            sb.append(data[3]+rparen);
-        }
         else {
             System.err.println("Insert Error");
             System.exit(1);
         }
         System.out.println(sql);
         sql = sb.toString();
-        int rs = ProjectMain.stmt.executeUpdate(sql);
+        int rs = stmt.executeUpdate(sql);
         ProjectMain.conn.commit();
     }
     protected static void Updatex(String tbl, String target, String data, String[] key) throws SQLException {
         StringBuilder sb = new StringBuilder();
         String sql = "";
+        Statement stmt = ProjectMain.conn.createStatement();
         sb.append("UPDATE "+tbl);
         sb.append(" SET "+target);
         sb.append(" = "+apx+data+apx);
@@ -144,23 +132,19 @@ public class SQLx {
             sb.append("CLASS_ID = "+apx+key[0]+apx+" AND ");
             sb.append("TUTEE_ID = "+apx+key[1]+apx);
         }
-        else if(tbl.equals("TRAIN_REG")) sb.append("CLASS_ID = "+apx+key[0]+apx);
         else if(tbl.equals("MATCH")) sb.append("MATCH_ID = "+apx+key[0]+apx);
         else if(tbl.equals("MATCH_APP_MEMBER")){
             sb.append("MATCH_ID = "+apx+key[0]+apx+" AND ");
             sb.append("MEMBER_ID = "+apx+key[1]+apx);
         }
-        else if(tbl.equals("MATCH_APP_MANAGER")){
-            sb.append("MATCH_ID = "+apx+key[0]+apx+" AND ");
-            sb.append("MANAGER_ID = "+apx+key[1]+apx);
-        }
         sql = sb.toString();
-        int rs = ProjectMain.stmt.executeUpdate(sql);
+        int rs = stmt.executeUpdate(sql);
         ProjectMain.conn.commit();
     }
     protected static void Deletex(String tbl, String[] key) throws SQLException {
         StringBuilder sb = new StringBuilder();
         String sql = "";
+        Statement stmt = ProjectMain.conn.createStatement();
         sb.append("DELETE FROM "+tbl);
         sb.append(" WHERE ");
         if(tbl.equals("USERS"))
@@ -187,18 +171,13 @@ public class SQLx {
             sb.append("CLASS_ID = "+apx+key[0]+apx+" AND ");
             sb.append("TUTEE_ID = "+apx+key[1]+apx);
         }
-        else if(tbl.equals("TRAIN_REG")) sb.append("CLASS_ID = "+apx+key[0]+apx);
         else if(tbl.equals("MATCH")) sb.append("MATCH_ID = "+apx+key[0]+apx);
         else if(tbl.equals("MATCH_APP_MEMBER")){
             sb.append("MATCH_ID = "+apx+key[0]+apx+" AND ");
             sb.append("MEMBER_ID = "+apx+key[1]+apx);
         }
-        else if(tbl.equals("MATCH_APP_MANAGER")){
-            sb.append("MATCH_ID = "+apx+key[0]+apx+" AND ");
-            sb.append("MANAGER_ID = "+apx+key[1]+apx);
-        }
         sql = sb.toString();
-        int rs = ProjectMain.stmt.executeUpdate(sql);
+        int rs = stmt.executeUpdate(sql);
         if(rs == 0){
             ProjectMain.conn.commit();
         }

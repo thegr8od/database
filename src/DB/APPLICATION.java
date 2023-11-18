@@ -3,10 +3,39 @@ package DB;
 import java.io.*;
 import java.sql.*;
 
+
+import java.util.Calendar;
 import java.util.Random;
+
+
 public class APPLICATION {
     protected static void MyPage(String id, boolean role) {
         BufferedReader bf = new BufferedReader(new InputStreamReader(System.in));
+        // 사용자 정보를 데이터베이스에서 가져오기
+        try {
+            ResultSet rsUser = SQLx.Selectx("*", "USERS", "ID_NUMBER = '" + id + "'", "");
+            ResultSet rsMember = SQLx.Selectx("*", "MEMBER", "ID_NUMBER = '" + id + "'", "");
+
+            if (rsUser.next() && rsMember.next()) { // 사용자 정보가 있다면
+                // 사용자 정보 출력
+                System.out.println("----------------------------------------------------");
+                System.out.println("User Info:");
+                System.out.println("ID: " + rsUser.getString("ID_NUMBER"));
+                System.out.println("Sex: " + rsUser.getString("SEX"));
+                System.out.println("Year of Birth: " + rsUser.getString("YOB"));
+                System.out.println("Job: " + rsUser.getString("JOB"));
+                System.out.println("Cash: " + rsMember.getInt("PREPAID_MONEY"));
+            } else {
+                System.out.println("----------------------------------------------------");
+                System.out.println("No user information available.");
+                System.out.println("----------------------------------------------------");
+            }
+            rsUser.close();
+            rsMember.close();
+        } catch (SQLException e) {
+            System.out.println("An error occurred while fetching user information.");
+            e.printStackTrace();
+        }
 
         while (true) {
             System.out.println("----------------------------------------------------");
@@ -89,10 +118,12 @@ public class APPLICATION {
             }
         }
     }
-    protected static void UserEval (String id){
+
+    protected static void UserEval(String id) {
         // UPDATE AND INSERT MANAGER -> MEMBER EVALUATION
     }
-    protected static void Screen (String id,boolean role, int opt){
+
+    protected static void Screen(String id, boolean role, int opt) {
         // false -> Manager, true -> Member
         // opt = 2. Training, 3. Match, 4. Team
         // TRAINING, MATCH, TEAM relation control
@@ -101,34 +132,65 @@ public class APPLICATION {
         Delete();
         Apply();
     }
-    private static void ChangeMyInfo (String userId,int option, String newValue){
+
+    private static void ChangeMyInfo(String userId, int option, String newValue) {
         String targetField;
+        boolean isValidInput = true; // 입력 값이 유효한지 확인하는 플래그
+
+        // 입력 값 검증
         switch (option) {
-            case 1:
+            case 1: // Password
                 targetField = "PASSWD";
+                if (newValue.length() < 10) {
+                    System.out.println("Invalid password. It must be at least 10 characters long.");
+                    isValidInput = false;
+                }
                 break;
-            case 2:
+            case 2: // Sex
                 targetField = "SEX";
+                if (!newValue.equals("M") && !newValue.equals("F")) {
+                    System.out.println("Invalid sex. Please enter 'M' for Male or 'F' for Female.");
+                    isValidInput = false;
+                }
                 break;
-            case 3:
+            case 3: // Year of Birth
                 targetField = "YOB";
+                try {
+                    int yearOfBirth = Integer.parseInt(newValue);
+                    int currentYear = Calendar.getInstance().get(Calendar.YEAR);
+                    if (yearOfBirth < 1900 || yearOfBirth >= currentYear) {
+                        System.out.println("Invalid Year of Birth. Please enter a year between 1900 and " + (currentYear - 1) + ".");
+                        isValidInput = false;
+                    }
+                } catch (NumberFormatException e) {
+                    System.out.println("Invalid Year of Birth. Please enter a valid year.");
+                    isValidInput = false;
+                }
                 break;
-            case 4:
+            case 4: // Job
                 targetField = "JOB";
+                // Job 필드에 대한 추가적인 유효성 검사가 필요하다면 여기에 로직을 추가하세요.
                 break;
             default:
                 System.out.println("Invalid option");
                 return;
         }
 
+        if (!isValidInput) {
+            return; // 유효하지 않은 입력이면 업데이트를 중단합니다.
+        }
+
+        // 데이터베이스 업데이트
         try {
             String[] key = {userId}; // 키 배열에는 변경할 사용자 ID를 지정
             SQLx.Updatex("USERS", targetField, newValue, key); // 업데이트 실행
             System.out.println(targetField + " updated for user: " + userId);
         } catch (SQLException e) {
+            System.out.println("Error updating " + targetField + " for user: " + userId);
             e.printStackTrace();
         }
-    }// UPDATE USER, MANAGER, MEMBER
+    }
+
     private static void CashCharge(String memberId, int amount) {
         try {
             // 기존의 PREPAID_MONEY 값을 먼저 조회
@@ -148,6 +210,7 @@ public class APPLICATION {
             e.printStackTrace();
         }
     }// ONLY FOR USER, UPDATE PREPAID_MONEY
+
     private static void Secession(String userId) {
         try {
             // key 배열에는 삭제할 행의 기본키나 조건을 지정합니다.
@@ -159,18 +222,23 @@ public class APPLICATION {
             e.printStackTrace();
         }
     }// DELETE USER ON CASCADE
-    private static void Make () {
+
+    private static void Make() {
 
     } // insert entity rela on cascade
-    private static void Cancel () {
+
+    private static void Cancel() {
 
     } // delete relationship rela -> PREPAID_MONEY CHANGE REFELCT
-    private static void Delete () {
+
+    private static void Delete() {
 
     } // delete entitiy rela on cascade
-    private static void Apply () {
+
+    private static void Apply() {
 
     } // insert relationship rela -> PREPAID_MONEY CHANGE REFELCT
-    private static void Check () {
+
+    private static void Check() {
     } // select where id_num in ~ ex) my teams, my matches
 }
