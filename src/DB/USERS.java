@@ -130,7 +130,7 @@ public class USERS {
             ResultSet rs = SQLx.Selectx("ID_NUMBER", "MEMBER", where.toString(), "");
             rs.last();
             where.setLength(0);
-            if(rs.getRow() == 1){
+            if(rs.getRow() == 0){
                 System.out.println("----------------------------------------------------");
                 System.out.println("Manager Screen");
                 while (true){

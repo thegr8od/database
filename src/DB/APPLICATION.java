@@ -2,6 +2,8 @@ package DB;
 
 import java.io.*;
 import java.sql.*;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 
 import java.util.Calendar;
@@ -19,7 +21,7 @@ public class APPLICATION {
             if (rsUser.next() && rsMember.next()) { // 사용자 정보가 있다면
                 // 사용자 정보 출력
                 System.out.println("----------------------------------------------------");
-                System.out.println("User Info:");
+                System.out.println("User Info");
                 System.out.println("ID: " + rsUser.getString("ID_NUMBER"));
                 System.out.println("Sex: " + rsUser.getString("SEX"));
                 System.out.println("Year of Birth: " + rsUser.getString("YOB"));
@@ -119,9 +121,43 @@ public class APPLICATION {
         }
     }
 
-    protected static void UserEval(String id) {
-        // UPDATE AND INSERT MANAGER -> MEMBER EVALUATION
+
+    protected static void UserEval(String managerId) throws IOException, SQLException {
+        BufferedReader bf = new BufferedReader(new InputStreamReader(System.in));
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        String currentDate = dateFormat.format(new Date()); // 현재 날짜
+
+        System.out.println("----------------------------------------------------");
+        System.out.println("Manager Evaluation");
+        System.out.print("Enter Member ID for evaluation: ");
+        String memberId = bf.readLine();
+
+        System.out.print("Enter Evaluation Tier (A/B/C/D): ");
+        String evalTier = bf.readLine().toUpperCase();
+
+        // 유효성 검사
+        if (!(evalTier.equals("A") || evalTier.equals("B") || evalTier.equals("C") || evalTier.equals("D"))) {
+            System.out.println("Invalid Evaluation Tier. Please enter A, B, C, or D.");
+            return;
+        }
+
+        // 평가 존재 여부 확인
+        ResultSet rs = SQLx.Selectx("*", "MAN_EVAL_MEM", "MEM_ID = '" + memberId + "' AND MAN_ID = '" + managerId + "'", "");
+
+        if (rs.next()) { // 평가가 이미 존재하면 업데이트
+            String[] key = {memberId, managerId};
+            SQLx.Updatex("MAN_EVAL_MEM", "EVAL_TIER", evalTier, key);
+            SQLx.Updatex("MAN_EVAL_MEM", "UPDATE_TIME", currentDate, key); // 현재 날짜 사용
+            System.out.println("Evaluation Updated.");
+        } else { // 새로운 평가면 삽입
+            String[] data = {memberId, managerId, evalTier, currentDate}; // 현재 날짜 포함
+            SQLx.Insertx("MAN_EVAL_MEM", data);
+            System.out.println("Evaluation Inserted.");
+        }
+        rs.close();
     }
+
+
 
     protected static void Screen(String id, boolean role, int opt) {
         // false -> Manager, true -> Member
@@ -167,9 +203,8 @@ public class APPLICATION {
                     isValidInput = false;
                 }
                 break;
-            case 4: // Job
+            case 4:
                 targetField = "JOB";
-                // Job 필드에 대한 추가적인 유효성 검사가 필요하다면 여기에 로직을 추가하세요.
                 break;
             default:
                 System.out.println("Invalid option");
@@ -177,7 +212,7 @@ public class APPLICATION {
         }
 
         if (!isValidInput) {
-            return; // 유효하지 않은 입력이면 업데이트를 중단합니다.
+            return; // 유효하지 않은 입력이면 업데이트를 중단
         }
 
         // 데이터베이스 업데이트
@@ -199,7 +234,7 @@ public class APPLICATION {
                 int currentAmount = rs.getInt("PREPAID_MONEY");
                 int newAmount = currentAmount + amount;
 
-                // key 배열에는 타겟이 되는 행의 기본키나 조건을 지정합니다.
+                // key 배열에는 타겟이 되는 행의 기본키나 조건을 지정
                 String[] key = {memberId};
                 // SQLx 클래스의 Updatex 메소드를 사용하여 PREPAID_MONEY 업데이트
                 SQLx.Updatex("MEMBER", "PREPAID_MONEY", String.valueOf(newAmount), key);
@@ -213,7 +248,7 @@ public class APPLICATION {
 
     private static void Secession(String userId) {
         try {
-            // key 배열에는 삭제할 행의 기본키나 조건을 지정합니다.
+            // key 배열에는 삭제할 행의 기본키나 조건을 지정
             String[] key = {userId};
             // SQLx 클래스의 Deletex 메소드를 사용하여 사용자 삭제
             SQLx.Deletex("USERS", key);
