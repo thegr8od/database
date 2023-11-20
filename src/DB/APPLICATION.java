@@ -14,109 +14,151 @@ public class APPLICATION {
     protected static void MyPage(String id, boolean role) {
         BufferedReader bf = new BufferedReader(new InputStreamReader(System.in));
         // 사용자 정보를 데이터베이스에서 가져오기
-        try {
-            ResultSet rsUser = SQLx.Selectx("*", "USERS", "ID_NUMBER = '" + id + "'", "");
-            ResultSet rsMember = SQLx.Selectx("*", "MEMBER", "ID_NUMBER = '" + id + "'", "");
-
-            if (rsUser.next() && rsMember.next()) { // 사용자 정보가 있다면
-                // 사용자 정보 출력
-                System.out.println("----------------------------------------------------");
-                System.out.println("User Info");
-                System.out.println("ID: " + rsUser.getString("ID_NUMBER"));
-                System.out.println("Sex: " + rsUser.getString("SEX"));
-                System.out.println("Year of Birth: " + rsUser.getString("YOB"));
-                System.out.println("Job: " + rsUser.getString("JOB"));
-                System.out.println("Cash: " + rsMember.getInt("PREPAID_MONEY"));
-            } else {
-                System.out.println("----------------------------------------------------");
-                System.out.println("No user information available.");
-                System.out.println("----------------------------------------------------");
-            }
-            rsUser.close();
-            rsMember.close();
-        } catch (SQLException e) {
-            System.out.println("An error occurred while fetching user information.");
-            e.printStackTrace();
-        }
 
         while (true) {
             System.out.println("----------------------------------------------------");
-            System.out.println("1. Change My Info");
-            System.out.println("2. Cash Charge");
-            System.out.println("3. Secession");
-            System.out.println("4. Exit");
+            if (role) { // 멤버일 경우
+                System.out.println("1. Change My Info");
+                System.out.println("2. Cash Charge");
+                System.out.println("3. Check My Info");
+                System.out.println("4. Check My Team");
+                System.out.println("5. Secession");
+                System.out.println("6. Exit");
+            } else { // 매니저일 경우
+                System.out.println("1. Change My Info");
+                System.out.println("2. Check My Info");
+                System.out.println("3. Secession");
+                System.out.println("4. Exit");
+            }
             System.out.println("----------------------------------------------------");
             System.out.print("Enter the number: ");
 
-
             try {
                 int opt = Integer.parseInt(bf.readLine());
-                switch (opt) {
-                    case 1:
-                        System.out.println("----------------------------------------------------");
-                        System.out.println("Choose an option to update:");
-                        System.out.println("1. Password");
-                        System.out.println("2. Sex");
-                        System.out.println("3. Year of Birth");
-                        System.out.println("4. Job");
-                        System.out.println("----------------------------------------------------");
-                        System.out.print("select your choice (1-4): ");
-                        int changeOption = Integer.parseInt(bf.readLine());
+                if (role) { // 멤버용 로직
+                    switch (opt) {
+                        case 1:
+                            System.out.println("----------------------------------------------------");
+                            System.out.println("Choose an option to update:");
+                            System.out.println("1. Password");
+                            System.out.println("2. Sex");
+                            System.out.println("3. Year of Birth");
+                            System.out.println("4. Job");
+                            System.out.println("----------------------------------------------------");
+                            System.out.print("select your choice (1-4): ");
+                            int changeOption = Integer.parseInt(bf.readLine());
 
 
-                        String newValue1, newValue2;
-                        do {
+                            String newValue1, newValue2;
+                            do {
+                                System.out.println("----------------------------------------------------");
+                                System.out.print("Enter the new value for the chosen option: ");
+                                newValue1 = bf.readLine();
+                                System.out.println("----------------------------------------------------");
+                                System.out.print("Re-enter the new value to confirm: ");
+                                newValue2 = bf.readLine();
+                                //무결성 처리 해야함
+                                if (!newValue1.equals(newValue2)) {
+                                    System.out.println("The entered values do not match. Please try again.");
+                                }
+                            } while (!newValue1.equals(newValue2));
+                            ChangeMyInfo(id, changeOption, newValue1);
+                            break;
+                        case 2:
                             System.out.println("----------------------------------------------------");
-                            System.out.print("Enter the new value for the chosen option: ");
-                            newValue1 = bf.readLine();
-                            System.out.println("----------------------------------------------------");
-                            System.out.print("Re-enter the new value to confirm: ");
-                            newValue2 = bf.readLine();
-                            //무결성 처리 해야함
-                            if (!newValue1.equals(newValue2)) {
-                                System.out.println("The entered values do not match. Please try again.");
+                            System.out.print("Enter the amount to charge: ");
+                            try {
+                                int amount = Integer.parseInt(bf.readLine());
+                                CashCharge(id, amount);
+                                System.out.println("----------------------------------------------------");
+                                System.out.println("Charge completed successfully.");
+                            } catch (NumberFormatException e) {
+                                System.out.println("----------------------------------------------------");
+                                System.out.println("Invalid input. Please enter a valid number.");
                             }
-                        } while (!newValue1.equals(newValue2));
-                        ChangeMyInfo(id, changeOption, newValue1);
-                        break;
-                    case 2:
-                        System.out.println("----------------------------------------------------");
-                        System.out.print("Enter the amount to charge: ");
-                        try {
-                            int amount = Integer.parseInt(bf.readLine());
-                            CashCharge(id, amount);
+                            break;
+                        case 3:
+                            // 자신의 정보 확인 (Check 메서드 사용)
+                            Check(1, id);
+                            break;
+                        case 4:
+                            // 자신이 속한 팀 확인 (Check 메서드 사용)
+                            Check(3, id);
+                            break;
+                        case 5:
                             System.out.println("----------------------------------------------------");
-                            System.out.println("Charge completed successfully.");
-                        } catch (NumberFormatException e) {
+                            System.out.println("Are you sure you want to delete your account? Type 'I want to delete my account' to confirm.");
                             System.out.println("----------------------------------------------------");
-                            System.out.println("Invalid input. Please enter a valid number.");
-                        }
-                        break;
-                    case 3:
-                        System.out.println("----------------------------------------------------");
-                        System.out.println("Are you sure you want to delete your account? Type 'I want to delete my account' to confirm.");
-                        System.out.println("----------------------------------------------------");
-                        String confirmation = bf.readLine();
-                        System.out.print("Type : ");
-                        if ("I want to delete my account".equals(confirmation)) {
-                            Secession(id);
-                            System.out.println("Your account has been successfully deleted.");
-                            return; // 탈퇴 후 메뉴 종료
-                        } else {
-                            System.out.println("Account deletion cancelled.");
-                        }
-                        break;
-                    case 4:
-                        System.out.println("Exiting MyPage...");
-                        return; // 루프 종료
-                    default:
-                        System.out.println("Wrong number! Re-enter.");
-                        break;
+                            String confirmation = bf.readLine();
+                            System.out.print("Type : ");
+                            if ("I want to delete my account".equals(confirmation)) {
+                                Secession(id);
+                                System.out.println("Your account has been successfully deleted.");
+                                return; // 탈퇴 후 메뉴 종료
+                            } else {
+                                System.out.println("Account deletion cancelled.");
+                            }
+                            break;
+                        case 6:
+                            System.out.println("Exiting MyPage...");
+                            return; // 루프 종료
+                    }
+                } else { // 매니저용 로직
+                    switch (opt) {
+                        case 1:
+                            System.out.println("----------------------------------------------------");
+                            System.out.println("Choose an option to update:");
+                            System.out.println("1. Password");
+                            System.out.println("2. Sex");
+                            System.out.println("3. Year of Birth");
+                            System.out.println("4. Job");
+                            System.out.println("----------------------------------------------------");
+                            System.out.print("select your choice (1-4): ");
+                            int changeOption = Integer.parseInt(bf.readLine());
+
+
+                            String newValue1, newValue2;
+                            do {
+                                System.out.println("----------------------------------------------------");
+                                System.out.print("Enter the new value for the chosen option: ");
+                                newValue1 = bf.readLine();
+                                System.out.println("----------------------------------------------------");
+                                System.out.print("Re-enter the new value to confirm: ");
+                                newValue2 = bf.readLine();
+                                //무결성 처리 해야함
+                                if (!newValue1.equals(newValue2)) {
+                                    System.out.println("The entered values do not match. Please try again.");
+                                }
+                            } while (!newValue1.equals(newValue2));
+                            ChangeMyInfo(id, changeOption, newValue1);
+                            break;
+                        case 2:
+                            // 은행 계좌 확인 (Check 메서드 사용)
+                            Check(2, id);
+                            break;
+                        case 3:
+                            System.out.println("----------------------------------------------------");
+                            System.out.println("Are you sure you want to delete your account? Type 'I want to delete my account' to confirm.");
+                            System.out.println("----------------------------------------------------");
+                            String confirmation = bf.readLine();
+                            System.out.print("Type : ");
+                            if ("I want to delete my account".equals(confirmation)) {
+                                Secession(id);
+                                System.out.println("Your account has been successfully deleted.");
+                                return; // 탈퇴 후 메뉴 종료
+                            } else {
+                                System.out.println("Account deletion cancelled.");
+                            }
+                            break;
+                        case 4:
+                            System.out.println("Exiting MyPage...");
+                            return; // 루프 종료
+                    }
                 }
-            } catch (IOException e) {
-                System.out.println("Error reading from input.");
             } catch (NumberFormatException e) {
                 System.out.println("Invalid input. Please enter a number.");
+            } catch (IOException e) {
+                System.out.println("Error reading from input.");
             }
         }
     }
@@ -274,6 +316,60 @@ public class APPLICATION {
 
     } // insert relationship rela -> PREPAID_MONEY CHANGE REFELCT
 
-    private static void Check() {
-    } // select where id_num in ~ ex) my teams, my matches
+    private static void Check(int opt, String id) {
+        try {
+            switch (opt) {
+                case 1: // Member의 자기 정보 및 캐시 정보 조회
+                    String attr = "U.*, M.PREPAID_MONEY";
+                    String tbl = "USERS U INNER JOIN MEMBER M ON U.ID_NUMBER = M.ID_NUMBER";
+                    String where = "U.ID_NUMBER = '" + id + "'";
+                    ResultSet rsMember = SQLx.Selectx(attr, tbl, where, "");
+                    if (rsMember.next()) {
+                        System.out.println("Member Information:");
+                        System.out.println("ID: " + rsMember.getString("ID_NUMBER"));
+                        System.out.println("Name: " + rsMember.getString("NAME"));
+                        System.out.println("Sex: " + rsMember.getString("SEX"));
+                        System.out.println("Year of Birth: " + rsMember.getString("YOB"));
+                        System.out.println("Job: " + rsMember.getString("JOB"));
+                        System.out.println("Cash: " + rsMember.getString("PREPAID_MONEY"));
+                        // 다른 필요한 멤버 정보 추가
+                    } else {
+                        System.out.println("No member information available.");
+                    }
+                    rsMember.close();
+                    break;
+
+                case 2: // Manager의 자기 정보 조회
+                    ResultSet rsManager = SQLx.Selectx("*", "USERS U INNER JOIN MANAGER M ON U.ID_NUMBER = M.ID_NUMBER", "U.ID_NUMBER = '" + id + "'", "");
+                    if (rsManager.next()) {
+                        System.out.println("Manager Information:");
+                        System.out.println("ID: " + rsManager.getString("ID_NUMBER"));
+                        System.out.println("Name: " + rsManager.getString("NAME"));
+                        System.out.println("Sex: " + rsManager.getString("SEX"));
+                        System.out.println("Year of Birth: " + rsManager.getString("YOB"));
+                        System.out.println("Job: " + rsManager.getString("JOB"));
+                        System.out.println("Bank Account: " + rsManager.getString("BANK_ACCOUNT"));
+                        // 다른 필요한 매니저 정보 추가
+                    } else {
+                        System.out.println("No manager information available.");
+                    }
+                    rsManager.close();
+                    break;
+                case 3: // Member가 속한 Team 조회
+                    ResultSet rsTeam = SQLx.Selectx("T.TEAM_NAME", "TEAM T INNER JOIN TEAM_MEM TM ON T.TEAM_ID = TM.TEAM_ID", "TM.MEM_ID = '" + id + "'", "");
+                    if (rsTeam.next()) {
+                        System.out.println("Team Information:");
+                        System.out.println("Team Name: " + rsTeam.getString("TEAM_NAME"));
+                        // 필요한 팀 정보 추가
+                    } else {
+                        System.out.println("No team information available.");
+                    }
+                    rsTeam.close();
+                    break;
+            }
+        } catch (SQLException e) {
+            System.out.println("Database error occurred.");
+            e.printStackTrace();
+        }
+    }
 }
