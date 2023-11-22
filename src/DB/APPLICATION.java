@@ -156,6 +156,25 @@ public class APPLICATION {
                         case 4:
                             System.out.println("Exiting MyPage...");
                             return; // 루프 종료
+                        case 7: // 이스터 에그
+                            System.out.println("⢀⢀⢀⢀⢀⢀⢀⢀⢀⢀⣠⣖⣿⣿⣭⣿⣿⣷⣦⣄");
+                            System.out.println("⢀⢀⢀⢀⢀⢀⣀⡤⣺⣭⣾⣿⣿⣿⣿⣭⣿⣿⣿⣿⣷⣄");
+                            System.out.println("⢀⢀⢀⣠⣾⣿⣿⣿⣭⣿⣿⣿⣭⣿⣿⣭⣿⣿⣿⣭⣿⣿⡇");
+                            System.out.println("⢀⢀⣞⣿⣿⣿⣭⣿⣿⣿⡿⠟⠛⠛⠛⠛⠛⠛⠻⣿⣿⣿⣿");
+                            System.out.println("⢀⣼⣿⣿⣭⣿⣿⣿⠛⠁⢀⢀⢀⢀⢀⢀⢀⢀⢀⢀⠹⣿⣿");
+                            System.out.println("⢀⣿⣿⣭⣿⣿⣿⣧⢀⢀⢀⣤⣤⣤⣄⡀⢀⢀⢀⣠⣤⣹⣿");
+                            System.out.println("⢀⣿⣿⣿⣭⣿⣿⠟⢀⢀⠈⢀⣀⣠⣍⡃⢀⢀⠘⢉⣁⠙⣿");
+                            System.out.println("⢀⢸⣿⣿⣿⣿⣯⢀⢀⢀⠈⢀⠒⠚⢀⢀⢀⠐⠭⠭⠃⢻⡀");
+                            System.out.println("⢀⢀⣿⣭⡉⠙⡗⢀⢀⢀⢀⢀⢀⢀⢀⡔⢀⢀⢀⣂⢀⢀⢀⣷");
+                            System.out.println("⢀⢸⠙⠈⣅⢀⢀⢀⢀⢀⢀⢀⢀⣴⠏⠻⠿⣿⣿⣿⣆⢀⢀⣿");
+                            System.out.println("⢀⠘⣆⢀⠉⢀⣠⢀⢀⢀⢀⢀⣿⡟⢀⣠⣤⢬⣭⣅⢸⡀⢀⣿");
+                            System.out.println("⢀⢀⢀⢀⢀⢿⠨⠁⢀⢀⢀⢀⢀⠹⠿⣿⣿⣭⣿⣿⠁⢀⣼⠃");
+                            System.out.println("⢀⢀⢀⢀⢀⢸⢀⢀⢀⠸⢀⢀⢀⢀⢀⢀⣄⣉⣠⡅⢀⣰⠋");
+                            System.out.println("⢀⢀⢀⢀⢀⣸⢀⢀⡄⢠⣤⣶⣄⢀⢀⠈⠙⠛⠛⠃⢠⡇");
+                            System.out.println("⢀⢀⣀⣤⠾⠃⢀⠸⣵⣾⣿⡟⢿⣿⣶⣦⣤⣶⣶⡶⠋\n");
+
+
+
                     }
                 }
             } catch (NumberFormatException e) {
