@@ -75,8 +75,8 @@ public class ProjectMain {
         System.out.printf("|%-15s|%-40s|%-15s|\n", "Name", "Major", "ID_Number");
         System.out.println("--------------------------------------------------------------------------");
         System.out.printf("|%-15s|%-40s|%-15s|\n", "Dong-Hyeok Seo", "Computer Science and Engineering", "2021115360");
-        System.out.printf("|%-15s|%-40s|%-15s|\n", "Dong-Hyeok Seo", "Computer Science and Engineering", "2021115360");
-        System.out.printf("|%-15s|%-40s|%-15s|\n", "Dong-Hyeok Seo", "Computer Science and Engineering", "2021115360");
+        System.out.printf("|%-15s|%-40s|%-15s|\n", "Du-Young Hwang", "English Language and Literature", "2018110976");
+        System.out.printf("|%-15s|%-40s|%-15s|\n", "Seung-Jun Kim", "English Language and Literature", "2019110248");
         System.out.println("--------------------------------------------------------------------------");
         System.out.println(" SoccerLink, Project of Team 6, Updated : 2023.11.07");
         System.out.println(" Database(comp322), Instructor : Young-Kyoon Suh");

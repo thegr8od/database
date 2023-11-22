@@ -1,5 +1,7 @@
 package DB;
 
+import DB.ProjectMain;
+
 import javax.xml.transform.Result;
 import java.io.*;
 import java.sql.*;
@@ -166,7 +168,7 @@ public class APPLICATION {
 
 
     protected static void UserEval(String managerId) throws IOException, SQLException {
-        BufferedReader bf = new BufferedReader(new InputStreamReader(System.in));
+
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         String currentDate = dateFormat.format(new Date()); // 현재 날짜
 
@@ -247,14 +249,9 @@ public class APPLICATION {
         }
 
         // 데이터베이스 업데이트
-        try {
-            String[] key = {userId}; // 키 배열에는 변경할 사용자 ID를 지정
-            SQLx.Updatex("USERS", targetField, newValue, key); // 업데이트 실행
-            System.out.println(targetField + " updated for user: " + userId);
-        } catch (SQLException e) {
-            System.out.println("Error updating " + targetField + " for user: " + userId);
-            e.printStackTrace();
-        }
+        String[] key = {userId}; // 키 배열에는 변경할 사용자 ID를 지정
+        SQLx.Updatex("USERS", targetField, newValue, key); // 업데이트 실행
+        System.out.println(targetField + " updated for user: " + userId);
     }
 
     private static void CashCharge(String memberId, int amount) {
@@ -278,19 +275,15 @@ public class APPLICATION {
     }// ONLY FOR USER, UPDATE PREPAID_MONEY
 
     private static void Secession(String userId) {
-        try {
-            // key 배열에는 삭제할 행의 기본키나 조건을 지정
-            String[] key = {userId};
-            // SQLx 클래스의 Deletex 메소드를 사용하여 사용자 삭제
-            Deletex("USERS", key);
-            System.out.println("User deleted: " + userId);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        // key 배열에는 삭제할 행의 기본키나 조건을 지정
+        String[] key = {userId};
+        // SQLx 클래스의 Deletex 메소드를 사용하여 사용자 삭제
+        Deletex("USERS", key);
+        System.out.println("User deleted: " + userId);
     }// DELETE USER ON CASCADE
 
     protected static void Screen(String id, boolean role, int opt) throws IOException, SQLException {
-        BufferedReader bf = new BufferedReader(new InputStreamReader(System.in));
+
         // false -> Manager, true -> Member
         // opt = 2. Training, 3. Match, 4. Team
         // TRAINING, MATCH, TEAM relation control
@@ -298,29 +291,37 @@ public class APPLICATION {
         if(role) {
             if(opt ==2){
                 System.out.println("Enter the option which you want to do");
-                System.out.println("=====================================");
-                System.out.println("1. make training"); // training에 만들고자 하는 트레이닝 insert
-                System.out.println("2. delete training"); // training에 없애고자 하는 트레이팅 delete
-                System.out.println("3. apply training"); // training id와 member id를 training 테이블에 새로운 튜플로 insert
-                System.out.println("4. cancel training"); // traniing id와 member id를 가지는 튜플을 delete
-                System.out.println("5. Quit");
-                System.out.println("=====================================");
+                System.out.println("------------------------------------=");
+                System.out.println("1. View My training");
+                System.out.println("2. Search training");
+                System.out.println("3. make training"); // training에 만들고자 하는 트레이닝 insert
+                System.out.println("4. delete training"); // training에 없애고자 하는 트레이팅 delete
+                System.out.println("5. apply training"); // training id와 member id를 training 테이블에 새로운 튜플로 insert
+                System.out.println("6. cancel training"); // traniing id와 member id를 가지는 튜플을 delete
+                System.out.println("7. Quit");
+                System.out.println("------------------------------------=");
                 System.out.printf("Enter the number: ");
                 while(true) {
                     String detail = bf.readLine();
                     if (detail.equals("1")) {
-                        Make_training(id);
+                        Check(6,id);
                         break;
                     } else if (detail.equals("2")) {
+                        Check(7,id);
+                        break;
+                    }else if (detail.equals("3")) {
+                        Make_training(id);
+                        break;
+                    }else if (detail.equals("4")) {
                         Delete_training(id);
                         break;
-                    } else if (detail.equals("3")) {
+                    } else if (detail.equals("5")) {
                         Apply_training(id);
                         break;
-                    } else if (detail.equals("4")) {
+                    } else if (detail.equals("6")) {
                         Cancel_training(id);
                         break;
-                    } else if (detail.equals("5")) {
+                    } else if (detail.equals("7")) {
                         break;
                     }
                     else
@@ -329,13 +330,13 @@ public class APPLICATION {
             }
             else if(opt == 3){
                 System.out.println("Enter the option which you want to do");
-                System.out.println("=====================================");
+                System.out.println("------------------------------------=");
                 System.out.println("1. Search Match");
                 System.out.println("2. View My Match");
                 System.out.println("3. Apply Match");
                 System.out.println("4. Cancel Match");
                 System.out.println("5. Quit");
-                System.out.println("=====================================");
+                System.out.println("------------------------------------=");
                 System.out.printf("Enter the number: ");
                 while(true) {
                     String detail = bf.readLine();
@@ -365,13 +366,13 @@ public class APPLICATION {
             }
             else if(opt == 4){
                 System.out.println("Enter the option which you want to do");
-                System.out.println("=====================================");
+                System.out.println("------------------------------------=");
                 System.out.println("1. make team"); // team_id 랜덤으로 만들어주고 team_id와 team_name을 team에 insert, temam_mem에 만든 사람 자동 삽입
                 System.out.println("2. delete team"); // team, team_mem 둘 다 delete (cascade 한다면)
                 System.out.println("3. apply team"); // team_mem에서 team_id와 mem_id를 delete
                 System.out.println("4. cancel team"); // team_mem에서 team_id와 mem_id를 insert
                 System.out.println("5. Quit");
-                System.out.println("=====================================");
+                System.out.println("------------------------------------=");
                 System.out.printf("Enter the number: ");
                 while(true) {
                     String detail = bf.readLine();
@@ -404,7 +405,7 @@ public class APPLICATION {
     }
 
     public static void Make_training(String tutor_id) throws IOException, SQLException {
-        BufferedReader bf = new BufferedReader(new InputStreamReader(System.in));
+
         Random rand = new Random(System.currentTimeMillis());
         StringBuilder sb = new StringBuilder(); // class_id
         while(true) {
@@ -429,28 +430,26 @@ public class APPLICATION {
         String max_num = bf.readLine();
         System.out.printf("Enter the wage: ");
         String wage = bf.readLine();
-        try {
-            String[] result = new String[8];
-            result[0] = String.valueOf(sb);
-            result[1] = date_time;
-            result[2] = tutor_id;
-            result[3] = rec_tier;
-            result[4] = subject;
-            result[5] = place;
-            result[6] = max_num;
-            result[7] = wage;
-
-            Insertx("TRAINING", result);
-            System.out.println("Training data inserted successfully!");
-            System.out.println("Your Class ID is "+sb);
-        } catch (SQLException e) {
-            System.err.println("Error inserting training data: " + e.getMessage());
-        }
+        System.out.printf("Enter the cost per one: ");
+        String cost = bf.readLine();
+        String[] result = new String[9];
+        result[0] = String.valueOf(sb);
+        result[1] = date_time;
+        result[2] = tutor_id;
+        result[3] = rec_tier;
+        result[4] = subject;
+        result[5] = place;
+        result[6] = max_num;
+        result[7] = wage;
+        result[8] = cost;
+        Insertx("TRAINING", result);
+        System.out.println("Training data inserted successfully!");
+        System.out.println("Your Class ID is "+sb);
     }
 
 
     private static void Delete_training(String id) throws IOException {
-        BufferedReader bf = new BufferedReader(new InputStreamReader(System.in));
+
         int iter = 0;
         int cost = 0;
         while (true) {
@@ -463,7 +462,7 @@ public class APPLICATION {
             if (Class_id.toUpperCase().equals("Q"))
                 break;
             try {
-                ResultSet rs = Selectx("*", "TRAINING", " where Class_id = ' " + Class_id + "' and tutor_id = '" + id + "'");
+                ResultSet rs = Selectx("*", "TRAINING", " where Class_id = '" + Class_id + "' and tutor_id = '" + id + "'");
                 if (rs.next()) {
                     String[] key = new String[1];
                     key[0] = Class_id;
@@ -500,7 +499,7 @@ public class APPLICATION {
     }
 
     private static void Apply_training(String id) throws IOException, SQLException {
-        BufferedReader bf = new BufferedReader(new InputStreamReader(System.in));
+
         int iter = 0;
         int maxNum = 0;
         int nowNum = 0;
@@ -532,6 +531,14 @@ public class APPLICATION {
                 if(rs2.next())
                     cost = rs2.getInt("COST_PER_ONE");
                 // 1. 멤버의 prepaid_money를 갱신하는 쿼리를 PreparedStatement로 작성
+                rs = Selectx("PREPAID_MONEY", "MEMBER", "WHERE ID_NUMBER = '"+ id +"'");
+                rs.next();
+                int pm = rs.getInt(1);
+                if(pm < cost) {
+                    System.out.println("You don't have enough money, please Charge first");
+                    break;
+                }
+                // 1. 멤버의 prepaid_money를 갱신하는 쿼리를 PreparedStatement로 작성
                 String updatePrepaidMoneyQuery = "UPDATE member SET prepaid_money = prepaid_money - ? WHERE id_number = ?";
 
                 // 2. PrepareStatement 객체 생성
@@ -544,17 +551,13 @@ public class APPLICATION {
                     int updateResult = updatePrepaidMoneyStmt.executeUpdate();
 
                     if (updateResult > 0) {
-                        try {
-                            String[] data = new String[2];
-                            data[0] = Class_id;
-                            data[1] = id;
-                            Insertx("TRAIN_ENROLLS", data); // 어차피 여기서 한번에 commit
-                            System.out.println("Training is successfully applied!");
-                            break;
+                        String[] data = new String[2];
+                        data[0] = Class_id;
+                        data[1] = id;
+                        Insertx("TRAIN_ENROLLS", data); // 어차피 여기서 한번에 commit
+                        System.out.println("Training is successfully applied!");
+                        break;
 
-                        } catch (SQLException e) {
-                            System.err.println("Error applying for training: " + e.getMessage());
-                        }
                     }
                 }
             }
@@ -565,7 +568,7 @@ public class APPLICATION {
     }
     private static void Cancel_training(String id) throws IOException, SQLException {
         try {
-            BufferedReader bf = new BufferedReader(new InputStreamReader(System.in));
+
             int cost = 0;
             int iter = 0;
             while (true) {
@@ -615,30 +618,30 @@ public class APPLICATION {
     }
     private static void Apply_match(String id) throws SQLException, IOException {
         try {
-            BufferedReader bf = new BufferedReader(new InputStreamReader(System.in));
-            int iter =0;
+            int iter = 0;
             int cost = 0;
-            int maxNum= 0;
-            int nowNum = 0 ;
+            int maxNum = 0;
+            int nowNum = 0;
             String sexCon;
 
-            while(true){
+            while(true) {
                 if (iter == 0)
                     System.out.printf("Enter the Match_ID which you want to apply (Quit for q): ");
                 else
                     System.out.printf("Re Enter the Match_ID which you want to apply (Quit for q):");
-                String match_id = bf.readLine();
+
+                String match_id = bf.readLine().trim(); // 공백 제거
                 if(match_id.toUpperCase().equals("Q"))
                     break;
                 iter++;
 
-                ResultSet rs = Selectx("M.MATCH_ID, M.COST_PER_ONE, M.MAX_NUM, M.SEX_CONSTRAINT X.CNT",
+                ResultSet rs = Selectx("M.MATCH_ID, M.COST_PER_ONE, M.MAX_NUM, M.SEX_CONSTRAINT, X.CNT",
                         "MATCH M LEFT OUTER JOIN (SELECT MATCH_ID, COUNT(MEMBER_ID) AS CNT FROM MATCH_APP_MEMBER GROUP BY MATCH_ID) X ON M.MATCH_ID = X.MATCH_ID",
                         "where M.Match_ID = '"+match_id+"'");
 
                 if(rs.next()) {
-                    cost = rs.getInt("COST_PER_ONE"); // cost를 동적으로 테이블에서 받아옴
-                    maxNum = rs.getInt("MAX_NUM"); // maxNum을 테이블로부터 동적으로 받아옴
+                    cost = rs.getInt("COST_PER_ONE");
+                    maxNum = rs.getInt("MAX_NUM");
                     sexCon = rs.getString("SEX_CONSTRAINT");
                     nowNum = rs.getInt("CNT");
                 } else {
@@ -657,31 +660,26 @@ public class APPLICATION {
                     System.out.println("Match is already full");
                     break;
                 }
-                rs = Selectx("SEX", "USER", "WHERE ID_NUMBER = '"+ id +"'");
+                rs = Selectx("SEX", "USERS", "WHERE ID_NUMBER = '"+ id +"'");
                 rs.next();
                 String sex = rs.getString(1);
-                if(sex.equals(sexCon)){
+                if(!sex.equals(sexCon)){
                     System.out.println("You cannot satisfy sex constraint");
                     break;
                 }
-                // 1. 멤버의 prepaid_money를 갱신하는 쿼리를 PreparedStatement로 작성
+
                 String updatePrepaidMoneyQuery = "UPDATE member SET prepaid_money = prepaid_money - ? WHERE id_number = ?";
 
-                // 2. PrepareStatement 객체 생성
                 try (PreparedStatement updatePrepaidMoneyStmt = ProjectMain.conn.prepareStatement(updatePrepaidMoneyQuery)) {
-                    // 3. PreparedStatement에 매개변수 할당
                     updatePrepaidMoneyStmt.setInt(1, cost);
                     updatePrepaidMoneyStmt.setString(2, id);
 
-                    // 4. prepaid_money 갱신 실행
                     int updateResult = updatePrepaidMoneyStmt.executeUpdate();
 
                     if (updateResult > 0) {
-                        // 5. prepaid_money 갱신이 성공하면 MATCH_APP_MEMBER에 데이터 삽입
-                        String[] key = new String[3];
+                        String[] key = new String[2];
                         key[0] = match_id;
                         key[1] = id;
-                        key[2] = String.valueOf(cost);
                         Insertx("MATCH_APP_MEMBER", key);
 
                         System.out.println("Apply Match successful!");
@@ -691,14 +689,14 @@ public class APPLICATION {
                     }
                 }
             }
-        }catch (IOException | SQLException e) {
+        } catch (IOException | SQLException e) {
             System.err.println("Error Apply Match: " + e.getMessage());
         }
     }
 
     private static void Cancel_match(String id) {
         try {
-            BufferedReader bf = new BufferedReader(new InputStreamReader(System.in));
+
             int cost = 0;
             int iter = 0;
             while (true) {
@@ -710,23 +708,26 @@ public class APPLICATION {
                 if (match_id.toUpperCase().equals("Q"))
                     break;
                 iter++;
-                ResultSet rs = Selectx("COST_PER_ONE", "MATCH", "where Match_ID = '" + match_id + "' and memver_id = '" + id + "'");
+                ResultSet rs = Selectx("M.COST_PER_ONE",
+                        "MATCH M JOIN MATCH_APP_MEMBER MA ON M.MATCH_ID = MA.MATCH_ID",
+                        "WHERE M.MATCH_ID = '" + match_id + "' AND MA.MEMBER_ID = '" + id + "'");
+
                 if (rs.next()) {
                     cost = rs.getInt("COST_PER_ONE");
-                    // 1. 멤버의 prepaid_money를 갱신하는 쿼리를 PreparedStatement로 작성
+                    // 멤버의 prepaid_money를 갱신하는 쿼리를 PreparedStatement로 작성
                     String updatePrepaidMoneyQuery = "UPDATE member SET prepaid_money = prepaid_money + ? WHERE id_number = ?";
 
-                    // 2. PrepareStatement 객체 생성
+                    // PrepareStatement 객체 생성
                     try (PreparedStatement updatePrepaidMoneyStmt = ProjectMain.conn.prepareStatement(updatePrepaidMoneyQuery)) {
-                        // 3. PreparedStatement에 매개변수 할당
+                        // PreparedStatement에 매개변수 할당
                         updatePrepaidMoneyStmt.setInt(1, cost);
                         updatePrepaidMoneyStmt.setString(2, id);
 
-                        // 4. prepaid_money 갱신 실행
+                        // prepaid_money 갱신 실행
                         int updateResult = updatePrepaidMoneyStmt.executeUpdate();
 
                         if (updateResult > 0) {
-                            // 5. prepaid_money 갱신이 성공하면 MATCH_APP_MEMBER의 데이터 제거
+                            // prepaid_money 갱신이 성공하면 MATCH_APP_MEMBER의 데이터 제거
                             String[] key = new String[2];
                             key[0] = match_id;
                             key[1] = id;
@@ -749,7 +750,7 @@ public class APPLICATION {
 
     private static void Apply(String id) throws SQLException {
         try {
-            BufferedReader bf = new BufferedReader(new InputStreamReader(System.in));
+
             int i = 0;
             String match_id;
             while (true) {
@@ -790,7 +791,7 @@ public class APPLICATION {
         }
     }
     private static void Make_team(String id) throws IOException, SQLException {
-        BufferedReader bf = new BufferedReader(new InputStreamReader(System.in));
+
         Random rand = new Random(System.currentTimeMillis());
         StringBuilder sb = new StringBuilder(); // class_id
         while(true){
@@ -804,75 +805,75 @@ public class APPLICATION {
                 break;
         }
 
-        try {
-            String team_id = sb.toString();
+        String team_id = sb.toString();
 
-            System.out.printf("Enter the Team name : ");
-            String team_name = bf.readLine();
-            String[] key = new String[2];
-            key[0]=team_id;
-            key[1]=team_name;
-            Insertx("TEAM",key);
+        System.out.printf("Enter the Team name : ");
+        String team_name = bf.readLine();
+        String[] key = new String[2];
+        key[0]=team_id;
+        key[1]=team_name;
+        Insertx("TEAM",key);
 
 
-            String[] key2 = new String[2];
-            key2[0] = sb.toString();
-            key2[1] = id;
-            System.out.println(key2[0]);
-            System.out.println(key2[1]);
+        String[] key2 = new String[2];
+        key2[0] = sb.toString();
+        key2[1] = id;
+        System.out.println(key2[0]);
+        System.out.println(key2[1]);
 
-            Insertx("TEAM_MEM",key2);
-        } catch (SQLException e) {
-            System.err.println("Error make team tuple: " + e.getMessage());
-        }
+        Insertx("TEAM_MEM",key2);
         System.out.println("Team data inserted successfully!");
         System.out.println("Your Team ID is "+sb);
     }
     private static void Delete_team(String id) throws IOException {
-        BufferedReader bf = new BufferedReader(new InputStreamReader(System.in));
         int condition = 0;
         System.out.printf("Enter the Team_ID which you want to delete: ");
         String team_id = bf.readLine();
         try {
-            ResultSet rs = Selectx("COUNT(mem_id)","TEAM_MEM","where team_id = '" + team_id + "'");
-            ResultSet rs1 = Selectx("mem_id", "TEAM_MEM", "where team_id = '" + team_id + "'");
-            condition = rs.getInt("COUNT(mem_id)");
-            if(condition ==1 ) {
+            // 첫 번째 쿼리 실행
+            ResultSet rs = Selectx("COUNT(mem_id)", "TEAM_MEM", "where team_id = '" + team_id + "'");
+            if (rs.next()) {
+                condition = rs.getInt(1); // 첫 번째 컬럼의 값을 가져옵니다.
+            }
+
+            // 팀에 멤버가 한 명만 있는지 확인
+            if (condition == 1) {
+                // 두 번째 쿼리 실행
+                ResultSet rs1 = Selectx("mem_id", "TEAM_MEM", "where team_id = '" + team_id + "'");
                 if (rs1.next()) {
-                    String[] key = new String[1];
-                    key[0] = team_id;
+                    String mem_id = rs1.getString(1); // 첫 번째 컬럼의 값을 가져옵니다.
+
+                    // TEAM_MEM 테이블에서 해당 팀 삭제
+                    String[] key2 = {team_id, mem_id};
+                    Deletex("TEAM_MEM", key2);
+
+                    // TEAM 테이블에서 해당 팀 삭제
+                    String[] key = {team_id};
                     Deletex("TEAM", key);
 
-                    String[] key2 = new String[2];
-                    key2[0] = team_id;
-                    key2[1] = rs1.getString("mem_id");
-                    Deletex("TEAM_MEM", key2);
                     System.out.println("Delete team successfully!");
                 }
-            }
-            else
+            } else {
                 System.out.println("You can't delete it because members still exists in the team.");
+            }
         } catch (SQLException e) {
             System.err.println("Error deleting team tuple: " + e.getMessage());
         }
     }
+
     private static void Apply_team(String id) throws IOException {
-        BufferedReader bf = new BufferedReader(new InputStreamReader(System.in));
+
         System.out.println("Enter the Team_ID which you want to apply: ");
         String team_id = bf.readLine();
         String[] key2 = new String[2];
         key2[0] = team_id;
         key2[1] = id;
-        try {
-            Insertx("TEAM_MEM",key2);
-            System.out.println("Apply team successfully!");
-        } catch (SQLException e) {
-            System.err.println("Error apply team tuple: " + e.getMessage());
-        }
+        Insertx("TEAM_MEM",key2);
+        System.out.println("Apply team successfully!");
     }
     private static void Cancel_team(String id) throws IOException {
         try {
-            BufferedReader bf = new BufferedReader(new InputStreamReader(System.in));
+
             System.out.printf("Enter the Team ID which you want to cancel: ");
             String team_id = bf.readLine();
 
@@ -882,14 +883,14 @@ public class APPLICATION {
             Deletex("TEAM_MEM", key);
 
             System.out.println("Team cancellation successful!");
-        } catch (IOException | SQLException e) {
+        } catch (IOException e) {
             System.err.println("Error canceling training: " + e.getMessage());
         }
     }
 
     private static void Check(int opt, String id) throws IOException {
         try {
-            BufferedReader bf = new BufferedReader(new InputStreamReader(System.in));
+
             switch (opt) {
                 case 1: // Member의 자기 정보 및 캐시 정보 조회 P2_3.2.2
 
@@ -929,7 +930,7 @@ public class APPLICATION {
                     }
                     rsManager.close();
                     break;
-                case 3: // Member가 속한 Team 및 팀의 평가 등급 조회
+                case 3: // Member가 속한 Team 조회 P2_3.7.2
                     String attrT = "T.TEAM_NAME, E.TEAM_TIER";
                     String atlT = "TEAM T INNER JOIN TEAM_MEM TM ON T.TEAM_ID = TM.TEAM_ID LEFT JOIN TEAM_EVAL_VIEW E ON T.TEAM_ID = E.TEAM_ID";
                     String whereT = "TM.MEM_ID = '" + id + "'";
@@ -950,51 +951,166 @@ public class APPLICATION {
                     String time = bf.readLine();
                     System.out.printf("Enter the place you want to know: ");
                     String place = bf.readLine();
-                    String sqlQuery = "SELECT * FROM MATCH M, MATCH_EVAL_VIEW MV " +
-                            " WHERE M.MATCH_ID IN (" +
+                    String sqlQuery = "SELECT M.*, F.NAME FROM MATCH M " +
+                            "INNER JOIN FIELD F ON M.PLACE_ID = F.FIELD_ID " +
+                            "WHERE M.MATCH_ID IN (" +
                             "    (SELECT DISTINCT MATCH_ID " +
-                            "    FROM MATCH M1 " +
-                            "    WHERE M1.DATE_TIME = '" + time + "')" +
+                            "     FROM MATCH M1 " +
+                            "     WHERE M1.DATE_TIME = '" + time + "')" +
                             "    INTERSECT " +
                             "    (SELECT DISTINCT M2.MATCH_ID " +
-                            "    FROM MATCH M2 " +
-                            "    WHERE M2.PLACE_ID IN (" +
-                            "        SELECT FIELD_ID " +
-                            "        FROM FIELD " +
-                            "        WHERE FIELD.ADDRESS LIKE '%" + place + "%' ))" +
-                            ") AND M.MATCH_ID = MV.MATCH_ID";
-                    try{
+                            "     FROM MATCH M2 " +
+                            "     WHERE M2.PLACE_ID IN (" +
+                            "         SELECT FIELD_ID " +
+                            "         FROM FIELD " +
+                            "         WHERE FIELD.ADDRESS LIKE '%" + place + "%' ))" +
+                            ") AND M.MATCH_ID IN (SELECT MATCH_ID FROM MATCH_EVAL_VIEW)";
+                    try {
                         PreparedStatement stmt = ProjectMain.conn.prepareStatement(sqlQuery);
                         ResultSet rsMatch = stmt.executeQuery();
                         int row = 1;
-                        if(rsMatch.next()) { System.out.printf("%-3s | %-15s | %-15s | %-20s | %-5s | %-7s | %-15s | %-12s\n",
-                                "ROW", "MATCH_ID", "TIME", "PLACE", "TYPE", "MAX_NUM", "SEX_CONSTRAINT", "COST_PER_ONE");
-                            System.out.println("=================================================================================================================");
+                        if(rsMatch.next()) {
+                            System.out.printf("%-3s | %-15s | %-15s | %-20s | %-5s | %-7s | %-15s | %-12s\n",
+                                    "ROW", "MATCH_ID", "TIME", "PLACE", "TYPE", "MAX_NUM", "SEX_CONSTRAINT", "COST_PER_ONE");
+                            System.out.println("---------------------------------------------------------------------------------------------------------------");
 
                             System.out.printf("%-3d | %-15s | %-15s | %-20s | %-5s | %-7s | %-15s | %-12s\n",
-                                    row, rsMatch.getString(1), rsMatch.getDate(2).toString(), rsMatch.getString(3),
+                                    row, rsMatch.getString(1), rsMatch.getDate(2).toString(), rsMatch.getString("NAME"),
                                     rsMatch.getString(4), rsMatch.getString(5), rsMatch.getString(6), rsMatch.getString(9));
+                            row++;
                             while (rsMatch.next()) {
                                 System.out.printf("%-3d | %-15s | %-15s | %-20s | %-5s | %-7s | %-15s | %-12s\n",
-                                        row, rsMatch.getString(1), rsMatch.getDate(2).toString(), rsMatch.getString(3),
+                                        row, rsMatch.getString(1), rsMatch.getDate(2).toString(), rsMatch.getString("NAME"),
                                         rsMatch.getString(4), rsMatch.getString(5), rsMatch.getString(6), rsMatch.getString(9));
-
+                                row++;
                             }
                         }
-                        else
+                        else {
                             System.out.println("No match exists for the selected date and place.");
+                        }
                     } catch (SQLException e) {
                         throw new RuntimeException(e);
                     }
                     break;
                 case 5: // P2_3.6.1 자기가 속한 Match의 list 출력
-                    String sqlQuery2 ="SELECT * " +
-                            " FROM MATCH\n" +
-                            " WHERE MATCH_ID IN ( " +
-                            " SELECT MATCH_ID" +
-                            " FROM MATCH_APP_MEMBER" +
-                            " WHERE MEMBER_ID = 'U673-07-7888')" +
+                    String sqlQuery2 ="SELECT m.*, f.NAME\n" +
+                            "FROM MATCH m\n" +
+                            "         INNER JOIN FIELD f ON m.PLACE_ID = f.FIELD_ID\n" +
+                            "WHERE m.MATCH_ID IN (\n" +
+                            "    SELECT mm.MATCH_ID\n" +
+                            "    FROM MATCH_APP_MEMBER mm\n" +
+                            "    WHERE mm.MEMBER_ID = '" + id +"')" +
                             " ORDER BY DATE_TIME DESC";
+                    try{
+                        PreparedStatement stmt = ProjectMain.conn.prepareStatement(sqlQuery2);
+                        ResultSet rsMatch = stmt.executeQuery();
+                        int row = 1;
+                        if(rsMatch.next()) { System.out.printf("%-3s | %-15s | %-15s | %-20s | %-5s | %-7s | %-15s | %-12s\n",
+                                "ROW", "MATCH_ID", "TIME", "PLACE", "TYPE", "MAX_NUM", "SEX_CONSTRAINT", "COST_PER_ONE");
+                            System.out.println("---------------------------------------------------------------------------------------------------------------==");
+
+                            System.out.printf("%-3d | %-15s | %-15s | %-20s | %-5s | %-7s | %-15s | %-12s\n",
+                                    row, rsMatch.getString(1), rsMatch.getDate(2).toString(), rsMatch.getString("NAME"),
+                                    rsMatch.getString(4), rsMatch.getString(5), rsMatch.getString(6), rsMatch.getString(9));
+                            row++;
+                            while (rsMatch.next()) {
+                                System.out.printf("%-3d | %-15s | %-15s | %-20s | %-5s | %-7s | %-15s | %-12s\n",
+                                        row, rsMatch.getString(1), rsMatch.getDate(2).toString(), rsMatch.getString("NAME"),
+                                        rsMatch.getString(4), rsMatch.getString(5), rsMatch.getString(6), rsMatch.getString(9));
+                                row++;
+
+                            }
+                        }                        else
+                            System.out.println("No match exists.");
+                    } catch (SQLException e) {
+                        throw new RuntimeException(e);
+                    }
+                    break;
+                case 6: // P2_3.5.1
+                    String sqlQuery3  = "SELECT T.CLASS_ID, T.DATE_TIME, U.NAME, T.RECOMMEND_TIER, T.SUBJECT, T.PLACE, T.COST_PER_ONE\n" +
+                            "FROM USERS U INNER JOIN (" +
+                            "    SELECT * " +
+                            "    FROM TRAINING TX" +
+                            "    WHERE EXISTS( " +
+                            "        SELECT * " +
+                            "        FROM (" +
+                            "            SELECT class_id" +
+                            "            FROM train_enrolls TE" +
+                            "            WHERE TE.tutee_id = '"+id+"') X\n" +
+                            "        WHERE TX.CLASS_ID = X.CLASS_ID)) T ON U.ID_NUMBER = T.TUTOR_ID";
+
+                    try{
+                        PreparedStatement stmt = ProjectMain.conn.prepareStatement(sqlQuery3);
+                        ResultSet rsTraining = stmt.executeQuery();
+                        int row = 1;
+                        if(rsTraining.next()) { System.out.printf("%-3s | %-15s | %-15s | %-20s | %-17s | %-12s | %-25s | %-12s\n",
+                                "ROW", "CLASS_ID", "TIME", "TUTOR_NAME", "RECOMMEND_TIER", "SUBJECT", "PLACE", "COST_PER_ONE");
+                            System.out.println("------------------------------------------------------------------------------------------------------------------------------------------------=");
+
+                            System.out.printf("%-3d | %-15s | %-15s | %-20s | %-17s | %-12s | %-25s | %-12s\n",
+                                    row, rsTraining.getString(1), rsTraining.getDate(2).toString(), rsTraining.getString(3),
+                                    rsTraining.getString(4), rsTraining.getString(5), rsTraining.getString(6), rsTraining.getString(7));
+                            row++;
+                            while (rsTraining.next()) {
+                                System.out.printf("%-3d | %-15s | %-15s | %-20s | %-17s | %-12s | %-25s | %-12s\n",
+                                        row, rsTraining.getString(1), rsTraining.getDate(2).toString(), rsTraining.getString(3),
+                                        rsTraining.getString(4), rsTraining.getString(5), rsTraining.getString(6), rsTraining.getString(7));
+
+                            }
+                        }
+                        else
+                            System.out.println("No Training exists.");
+                    } catch (SQLException e) {
+                        throw new RuntimeException(e);
+                    }
+                    break;
+                case 7:
+                    System.out.printf("Enter the subject name which you want to search: ");
+                    String subject = bf.readLine();
+                    System.out.printf("Enter the recommended tier which you want to search: ");
+                    String re_tier = bf.readLine();
+                    String sqlQuery4 = "SELECT T.CLASS_ID, T.DATE_TIME, U.NAME, T.RECOMMEND_TIER, T.SUBJECT, T.PLACE, T.COST_PER_ONE\n" +
+                            "FROM USERS U INNER JOIN (\n" +
+                            "    select *\n" +
+                            "    from training TX\n" +
+                            "    WHERE TX.CLASS_ID IN (\n" +
+                            "        (SELECT DISTINCT CLASS_ID\n" +
+                            "         FROM TRAINING T1\n" +
+                            "        WHERE T1.SUBJECT = '"+ subject + "') " +
+                            "    INTERSECT\n" +
+                            "        (SELECT DISTINCT T2.CLASS_ID\n" +
+                            "        FROM TRAINING T2\n" +
+                            "        WHERE T2.RECOMMEND_TIER = '"+re_tier+"'))) T ON U.ID_NUMBER = T.TUTOR_ID\n" +
+                            "order by T.DATE_TIME";
+                    try {
+                        PreparedStatement stmt = ProjectMain.conn.prepareStatement(sqlQuery4);
+                        ResultSet rsTraining_search = stmt.executeQuery();
+                        int row = 1;
+                        if (rsTraining_search.next()) {
+                            System.out.printf("%-3s | %-15s | %-15s | %-20s | %-17s | %-12s | %-25s | %-12s\n",
+                                    "ROW", "CLASS_ID", "TIME", "TUTOR_NAME", "RECOMMEND_TIER", "SUBJECT", "PLACE", "COST_PER_ONE");
+                            System.out.println("------------------------------------------------------------------------------------------------------------------------------------------------=");
+
+                            System.out.printf("%-3d | %-15s | %-15s | %-20s | %-17s | %-12s | %-25s | %-12s\n",
+                                    row, rsTraining_search.getString(1), rsTraining_search.getDate(2).toString(), rsTraining_search.getString(3),
+                                    rsTraining_search.getString(4), rsTraining_search.getString(5), rsTraining_search.getString(6), rsTraining_search.getString(7));
+                            row++;
+                            while (rsTraining_search.next()) {
+                                System.out.printf("%-3d | %-15s | %-15s | %-20s | %-17s | %-12s | %-25s | %-12s\n",
+                                        row, rsTraining_search.getString(1), rsTraining_search.getDate(2).toString(), rsTraining_search.getString(3),
+                                        rsTraining_search.getString(4), rsTraining_search.getString(5), rsTraining_search.getString(6), rsTraining_search.getString(7));
+                                row++;
+                            }
+                        } else {
+                            System.out.println("No Training exists.");
+                        }
+                    } catch (SQLException e) {
+                        throw new RuntimeException(e);
+                    }
+
+                    break;
+
+
             }
         } catch (SQLException e) {
             System.out.println("Database error occurred.");
