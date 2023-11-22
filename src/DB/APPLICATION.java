@@ -957,13 +957,15 @@ public class APPLICATION {
                     String atlT = "TEAM T INNER JOIN TEAM_MEM TM ON T.TEAM_ID = TM.TEAM_ID LEFT JOIN TEAM_EVAL_VIEW E ON T.TEAM_ID = E.TEAM_ID";
                     String whereT = "TM.MEM_ID = '" + id + "'";
                     ResultSet rsTeam = SQLx.Selectx(attrT, atlT, whereT, "");
-                    if (rsTeam.next()) {
+                    if(!rsTeam.next()) {
+                        System.out.println("No team information available.");
+                        break;
+                    }
+                    while (rsTeam.next()) {
                         System.out.println("Team Information:");
                         System.out.println("Team Name: " + rsTeam.getString("TEAM_NAME"));
                         System.out.println("Team Tier: " + rsTeam.getString("TEAM_TIER"));
                         // 필요한 팀 정보 추가
-                    } else {
-                        System.out.println("No team information available.");
                     }
                     rsTeam.close();
                     break;
