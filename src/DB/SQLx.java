@@ -70,7 +70,13 @@ public class SQLx {
             sb.append(lparen);
             sb.append(apx+data[0]+apx+comma);
             sb.append(apx+data[1]+apx+comma);
-            sb.append(apx+data[2]+apx+rparen);
+            sb.append(apx+data[2]+apx+comma);
+            sb.append(apx+data[3]+apx+comma);
+            sb.append(apx+data[4]+apx+comma);
+            sb.append(apx+data[5]+apx+comma);
+            sb.append(data[6]+comma);
+            sb.append(data[7]+comma);
+            sb.append(data[8]+rparen);
         }
         else if(tbl.equals("TRAIN_ENROLLS")){
             sb.append(lparen);
@@ -83,19 +89,22 @@ public class SQLx {
             sb.append(apx+data[1]+apx+comma);
             sb.append(apx+data[2]+apx+comma);
             sb.append(apx+data[3]+apx+comma);
-            sb.append(apx+data[4]+apx+rparen);
+            sb.append(data[4]+comma);
+            sb.append(apx+data[5]+apx+comma);
+            sb.append(data[6]+comma);
+            sb.append(data[7]+comma);
+            sb.append(data[8]+rparen);
         }
         else if(tbl.equals("MATCH_APP_MEMBER")){
             sb.append(lparen);
+            sb.append(apx+data[0]+apx+comma);
             sb.append(apx+data[1]+apx+comma);
-            sb.append(apx+data[2]+apx+comma);
-            sb.append(data[3]+rparen);
+            sb.append(data[2]+rparen);
         }
         else {
             System.err.println("Insert Error");
             System.exit(1);
         }
-        System.out.println(sql);
         sql = sb.toString();
         int rs = stmt.executeUpdate(sql);
         ProjectMain.conn.commit();
@@ -213,7 +222,6 @@ public class SQLx {
         sb.append(" WHERE "+where);
         sb.append(" "+opt);
         sql = sb.toString();
-        System.out.println(sql);
         PreparedStatement stmt = ProjectMain.conn.prepareStatement(sql, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
         ResultSet rs = stmt.executeQuery(sql);
         ProjectMain.conn.commit();

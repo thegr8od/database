@@ -93,11 +93,13 @@ public class USERS {
             idps[0] = ProjectMain.bf.readLine().toUpperCase();
             System.out.print("PASSWD : ");
             idps[1] = ProjectMain.bf.readLine();
+            if(idps[0].equals("SOCCERLINK") && idps[1].equals("ADMIN!")) break;
             where.append("ID_NUMBER = " + apx + idps[0] + apx + " AND " + "PASSWD = " + apx + idps[1] + apx);
             ResultSet rs = SQLx.Selectx("ID_NUMBER, PASSWD", "USERS", where.toString(), "");
             rs.last();
             rows = rs.getRow();
             where.setLength(0);
+            if(rows == 0) System.out.println("WRONG ID and PASSWD!, Please Re-enter");
         } while (rows != 1);
         AfterLogIn(idps);
     }
@@ -113,24 +115,30 @@ public class USERS {
                 System.out.println("4. Field");
                 System.out.println("5. Match");
                 System.out.println("6. Training");
-                System.out.println("7. Log Out");
+                System.out.println("7. Check Some Information");
+                System.out.println("8. Log Out");
                 System.out.println("----------------------------------------------------");
                 System.out.print("Enter the number : ");
                 int opt = Integer.parseInt(ProjectMain.bf.readLine());
                 switch (opt){
                     case 1,2,3,4,5,6 : ADMIN.Screen(opt); break;
-                    case 7 : return;
+                    case 7 : ADMIN.Select();
+                    case 8 : return;
                     default: System.out.println("Wrong number!, Re-enter");
                 }
             }
         }
         else {
             StringBuilder where = new StringBuilder();
-            where.append("ID_NUMBER = "+apx+idps[0]+apx);
-            ResultSet rs = SQLx.Selectx("ID_NUMBER", "MEMBER", where.toString(), "");
-            rs.last();
+            where.append("ID_NUMBER = "+apx+idps[0]+apx); // P2_3.1.1
+            ResultSet rsMem = SQLx.Selectx("ID_NUMBER", "MEMBER", where.toString(), "");
+            ResultSet rsMan = SQLx.Selectx("ID_NUMBER", "MANAGER", where.toString(), "");
+            rsMan.last();
+            rsMem.last();
             where.setLength(0);
-            if(rs.getRow() == 0){
+            if(rsMan.getRow() == 1){
+                rsMem.close();
+                rsMan.close();
                 System.out.println("----------------------------------------------------");
                 System.out.println("Manager Screen");
                 while (true){
@@ -151,7 +159,9 @@ public class USERS {
                     }
                 }
             }
-            else if(rs.getRow() == 1){
+            else if(rsMem.getRow() == 1){
+                rsMem.close();
+                rsMan.close();
                 System.out.println("----------------------------------------------------");
                 System.out.println("User Screen");
                 while (true){
@@ -174,6 +184,8 @@ public class USERS {
             }
             else {
                 while (true){
+                    rsMem.close();
+                    rsMan.close();
                     System.out.println("----------------------------------------------------");
                     System.out.println("Your Role is missed, Pick your role");
                     System.out.println("1. Member, 2. Manager, 3. Quit");

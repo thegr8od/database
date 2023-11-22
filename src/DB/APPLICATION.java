@@ -1,5 +1,6 @@
 package DB;
 
+import javax.xml.transform.Result;
 import java.io.*;
 import java.sql.*;
 import java.text.SimpleDateFormat;
@@ -214,7 +215,7 @@ public class APPLICATION {
                 break;
             case 2: // Sex
                 targetField = "SEX";
-                if (!newValue.equals("M") && !newValue.equals("F")) {
+                if (!newValue.toUpperCase().equals("M") && !newValue.toUpperCase().equals("F")) {
                     System.out.println("Invalid sex. Please enter 'M' for Male or 'F' for Female.");
                     isValidInput = false;
                 }
@@ -296,14 +297,15 @@ public class APPLICATION {
 
         if(role) {
             if(opt ==2){
-                System.out.println("Enter the option which u want to do");
+                System.out.println("Enter the option which you want to do");
                 System.out.println("=====================================");
                 System.out.println("1. make training"); // training에 만들고자 하는 트레이닝 insert
                 System.out.println("2. delete training"); // training에 없애고자 하는 트레이팅 delete
                 System.out.println("3. apply training"); // training id와 member id를 training 테이블에 새로운 튜플로 insert
                 System.out.println("4. cancel training"); // traniing id와 member id를 가지는 튜플을 delete
+                System.out.println("5. Quit");
                 System.out.println("=====================================");
-                System.out.println("Enter the number: ");
+                System.out.printf("Enter the number: ");
                 while(true) {
                     String detail = bf.readLine();
                     if (detail.equals("1")) {
@@ -318,26 +320,42 @@ public class APPLICATION {
                     } else if (detail.equals("4")) {
                         Cancel_training(id);
                         break;
+                    } else if (detail.equals("5")) {
+                        break;
                     }
                     else
                         System.out.printf("Re Enter the number: ");
                 }
             }
             else if(opt == 3){
-                System.out.println("Enter the option which u want to do");
+                System.out.println("Enter the option which you want to do");
                 System.out.println("=====================================");
-                System.out.println("1. apply match");  // match id를 받아서 match_app_member에 insert, cost 어케 할거임?
-                System.out.println("2. cancel match"); // match id와 member id를 통해 match_app_member에서 해당값 delete
+                System.out.println("1. Search Match");
+                System.out.println("2. View My Match");
+                System.out.println("3. Apply Match");
+                System.out.println("4. Cancel Match");
+                System.out.println("5. Quit");
                 System.out.println("=====================================");
                 System.out.printf("Enter the number: ");
                 while(true) {
                     String detail = bf.readLine();
-                    if (detail.equals("1")) {
-                        Apply_match(id);
+                    if(detail.equals("1")){
+                        Check(4,id);
                         break;
                     }
                     else if (detail.equals("2")) {
+                        Check(5,id);
+                        break;
+                    }
+                    else if (detail.equals("3")) {
+                        Apply_match(id);
+                        break;
+                    }
+                    else if (detail.equals("4")) {
                         Cancel_match(id);
+                        break;
+                    }
+                    else if (detail.equals("5")) {
                         break;
                     }
                     else
@@ -346,12 +364,13 @@ public class APPLICATION {
 
             }
             else if(opt == 4){
-                System.out.println("Enter the option which u want to do");
+                System.out.println("Enter the option which you want to do");
                 System.out.println("=====================================");
                 System.out.println("1. make team"); // team_id 랜덤으로 만들어주고 team_id와 team_name을 team에 insert, temam_mem에 만든 사람 자동 삽입
                 System.out.println("2. delete team"); // team, team_mem 둘 다 delete (cascade 한다면)
                 System.out.println("3. apply team"); // team_mem에서 team_id와 mem_id를 delete
                 System.out.println("4. cancel team"); // team_mem에서 team_id와 mem_id를 insert
+                System.out.println("5. Quit");
                 System.out.println("=====================================");
                 System.out.printf("Enter the number: ");
                 while(true) {
@@ -367,6 +386,8 @@ public class APPLICATION {
                         break;
                     } else if (detail.equals("4")) {
                         Cancel_team(id);
+                        break;
+                    }else if (detail.equals("5")) {
                         break;
                     }
                     else
@@ -386,11 +407,17 @@ public class APPLICATION {
         BufferedReader bf = new BufferedReader(new InputStreamReader(System.in));
         Random rand = new Random(System.currentTimeMillis());
         StringBuilder sb = new StringBuilder(); // class_id
-        sb.append("C").append(Math.abs(rand.nextInt() % 10)).append(Math.abs(rand.nextInt() % 10)).append(Math.abs(rand.nextInt() % 10));
-        sb.append("-").append(Math.abs(rand.nextInt() % 10)).append(Math.abs(rand.nextInt() % 10));
-        sb.append("-").append(Math.abs(rand.nextInt() % 10)).append(Math.abs(rand.nextInt() % 10)).append(Math.abs(rand.nextInt() % 10)).append(Math.abs(rand.nextInt() % 10));
-
-        System.out.printf("Enter the Date_Time ex) 1998-08-31 : ");
+        while(true) {
+            sb.append("C").append(Math.abs(rand.nextInt() % 10)).append(Math.abs(rand.nextInt() % 10)).append(Math.abs(rand.nextInt() % 10));
+            sb.append("-").append(Math.abs(rand.nextInt() % 10)).append(Math.abs(rand.nextInt() % 10));
+            sb.append("-").append(Math.abs(rand.nextInt() % 10)).append(Math.abs(rand.nextInt() % 10)).append(Math.abs(rand.nextInt() % 10)).append(Math.abs(rand.nextInt() % 10));
+            ResultSet rs= Selectx("*","TRAINING","where Class_id = '"+sb+"'");
+            if(rs.next())
+                sb.setLength(0);
+            else
+                break;
+        }
+        System.out.printf("Enter the Date_Time ex) 1998-08-31: ");
         String date_time = bf.readLine();
         System.out.printf("Enter the RECOMMEND_TIER: ");
         String rec_tier = bf.readLine();
@@ -424,161 +451,360 @@ public class APPLICATION {
 
     private static void Delete_training(String id) throws IOException {
         BufferedReader bf = new BufferedReader(new InputStreamReader(System.in));
-        System.out.printf("Enter the Class_ID which you want to delete: ");
-        String Class_id = bf.readLine();
-        try {
-            String[] key = new String[1];
-            key[0] = Class_id;
-            Deletex("TRAINING", key);
-            System.out.println("Training tuple deleted successfully!");
-            String[] key2 = new String[2];
-            key2[0] = Class_id;
-            ResultSet rs1 = Selectx("tutee_ID","TRAIN_ENROLLS","where class_id = '"+id+"'");
-            while(rs1.next()) {
-                key2[1] = rs1.getString("tutee_id");
-                Deletex("TRAIN_ENROLLS", key2);
-            }
-        } catch (SQLException e) {
-            System.err.println("Error deleting training tuple: " + e.getMessage());
-        }
-    }
-
-    private static void Apply_training(String id)throws IOException {
-        BufferedReader bf = new BufferedReader(new InputStreamReader(System.in));
-        System.out.printf("Enter the Class_ID which you want to apply: ");
-        String Class_id = bf.readLine();
-        try {
-            String[] data = new String[2];
-            data[0] = Class_id;
-            data[1] = id;
-            Insertx("TRAIN_ENROLLS", data);
-            System.out.println("Training is successfully applied!");
-        } catch (SQLException e) {
-            System.err.println("Error applying for training: " + e.getMessage());
-        }
-    }
-    private static void Cancel_training(String id) throws IOException {
-        try {
-            BufferedReader bf = new BufferedReader(new InputStreamReader(System.in));
-            System.out.printf("Enter the Class_ID which you want to cancel: ");
+        int iter = 0;
+        int cost = 0;
+        while (true) {
+            if (iter == 0)
+                System.out.printf("Enter the Class_ID which you want to delete (Quit for 'Q'): ");
+            else
+                System.out.printf("Re Enter the Class_ID which you want to delete (Quit for 'Q'): ");
+            iter++;
             String Class_id = bf.readLine();
+            if (Class_id.toUpperCase().equals("Q"))
+                break;
+            try {
+                ResultSet rs = Selectx("*", "TRAINING", " where Class_id = ' " + Class_id + "' and tutor_id = '" + id + "'");
+                if (rs.next()) {
+                    String[] key = new String[1];
+                    key[0] = Class_id;
+                    Deletex("TRAINING", key);
+                    System.out.println("Training tuple deleted successfully!");
+                    String[] key2 = new String[2];
+                    key2[0] = Class_id;
+                    ResultSet rs1 = Selectx("tutee_ID", "TRAIN_ENROLLS", "where class_id = '" + Class_id + "'");
+                    cost = rs.getInt("COST_PER_ONE");
+                    while (rs1.next()) {
+                        key2[1] = rs1.getString("tutee_id");
 
-            String[] key = new String[2];
-            key[0] = Class_id;
-            key[1] = id;
-            Deletex("TRAIN_ENROLLS", key);
+                        String updatePrepaidMoneyQuery = "UPDATE member SET prepaid_money = prepaid_money + ? WHERE id_number = ?";
 
-            System.out.println("Training cancellation successful!");
-        } catch (IOException | SQLException e) {
-            System.err.println("Error canceling training: " + e.getMessage());
+                        // 2. PrepareStatement 객체 생성
+                        try (PreparedStatement updatePrepaidMoneyStmt = ProjectMain.conn.prepareStatement(updatePrepaidMoneyQuery)) {
+                            // 3. PreparedStatement에 매개변수 할당
+                            updatePrepaidMoneyStmt.setInt(1, cost);
+                            updatePrepaidMoneyStmt.setString(2, key2[1]);
+
+                            // 4. prepaid_money 갱신 실행
+                            int updateResult = updatePrepaidMoneyStmt.executeUpdate();
+                            Deletex("TRAIN_ENROLLS", key2);
+                        }
+                    }
+                }
+                else{
+                    System.out.println("You are not Tutor of this Class");
+                }
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
-    private static void Apply_match(String id) {
-        try {
-            BufferedReader bf = new BufferedReader(new InputStreamReader(System.in));
-            String cost = "6000";
-            int cost_i = 6000;
-            // cost는 어떻게 계산?
 
-            // 1. 멤버의 prepaid_money를 갱신하는 쿼리를 PreparedStatement로 작성
-            String updatePrepaidMoneyQuery = "UPDATE member SET prepaid_money = prepaid_money - ? WHERE id_number = ?";
+    private static void Apply_training(String id) throws IOException, SQLException {
+        BufferedReader bf = new BufferedReader(new InputStreamReader(System.in));
+        int iter = 0;
+        int maxNum = 0;
+        int nowNum = 0;
+        int cost = 0;
+        while (true) {
+            if (iter == 0)
+                System.out.printf("Enter the Class_ID which you want to apply (Quit for 'Q'): ");
+            else
+                System.out.printf("Re Enter the Class_ID which you want to apply (Quit for 'Q'): ");
+            String Class_id = bf.readLine();
+            iter++;
+            if (Class_id.toUpperCase().equals("Q"))
+                break;
+            ResultSet rs = Selectx("MAX_NUM", "TRAINING", "where CLASS_ID = '" + Class_id + "'");
+            ResultSet rs1 = Selectx("COUNT(CLASS_ID)", "TRAIN_ENROLLS", "where CLASS_ID = '" + Class_id + "'");
+            ResultSet rs2 = Selectx("COST_PER_ONE", "TRAINING","where CLASS_ID = '"+Class_id+"'");
 
-            // 2. PrepareStatement 객체 생성
-            try (PreparedStatement updatePrepaidMoneyStmt = ProjectMain.conn.prepareStatement(updatePrepaidMoneyQuery)) {
-                // 3. PreparedStatement에 매개변수 할당
-                updatePrepaidMoneyStmt.setInt(1, cost_i);
-                updatePrepaidMoneyStmt.setString(2, id);
+            if (rs.next()) {
+                maxNum = rs.getInt("MAX_NUM");
+                if (rs1.next()) {
+                    nowNum = rs1.getInt("COUNT(CLASS_ID)");
+                    if (maxNum <= nowNum) {
+                        System.out.println("The Training you chosen is full");
+                        continue;
+                    }
+                } else
+                    nowNum = 0;
 
-                // 4. prepaid_money 갱신 실행
-                int updateResult = updatePrepaidMoneyStmt.executeUpdate();
+                if(rs2.next())
+                    cost = rs2.getInt("COST_PER_ONE");
+                // 1. 멤버의 prepaid_money를 갱신하는 쿼리를 PreparedStatement로 작성
+                String updatePrepaidMoneyQuery = "UPDATE member SET prepaid_money = prepaid_money - ? WHERE id_number = ?";
 
-                if (updateResult > 0) {
-                    // 5. prepaid_money 갱신이 성공하면 MATCH_APP_MEMBER에 데이터 삽입
-                    System.out.printf("Enter the Match_ID which you want to apply: ");
-                    String[] key = new String[3];
-                    key[0] = bf.readLine();
-                    key[1] = id;
-                    key[2] = cost;
-                    Insertx("MATCH_APP_MEMBER", key);
+                // 2. PrepareStatement 객체 생성
+                try (PreparedStatement updatePrepaidMoneyStmt = ProjectMain.conn.prepareStatement(updatePrepaidMoneyQuery)) {
+                    // 3. PreparedStatement에 매개변수 할당
+                    updatePrepaidMoneyStmt.setInt(1, cost);
+                    updatePrepaidMoneyStmt.setString(2, id);
 
-                    System.out.println("Apply Match successful!");
-                } else {
-                    System.out.println("Error applying match: Failed to update prepaid_money for member " + id);
+                    // 4. prepaid_money 갱신 실행
+                    int updateResult = updatePrepaidMoneyStmt.executeUpdate();
+
+                    if (updateResult > 0) {
+                        try {
+                            String[] data = new String[2];
+                            data[0] = Class_id;
+                            data[1] = id;
+                            Insertx("TRAIN_ENROLLS", data); // 어차피 여기서 한번에 commit
+                            System.out.println("Training is successfully applied!");
+                            break;
+
+                        } catch (SQLException e) {
+                            System.err.println("Error applying for training: " + e.getMessage());
+                        }
+                    }
                 }
             }
-        } catch (IOException | SQLException e) {
+            else{
+                System.out.println("The Training ID you entered does not exist.");
+            }
+        }
+    }
+    private static void Cancel_training(String id) throws IOException, SQLException {
+        try {
+            BufferedReader bf = new BufferedReader(new InputStreamReader(System.in));
+            int cost = 0;
+            int iter = 0;
+            while (true) {
+                if (iter == 0)
+                    System.out.printf("Enter the Class_ID which you want to cancel (Quit for 'Q'): ");
+                else
+                    System.out.printf("Re Enter the Class_ID which you want to cancel (Quit for 'Q'): ");
+                String Class_id = bf.readLine();
+                iter++;
+                if (Class_id.toUpperCase().equals("Q"))
+                    break;
+                ResultSet rs = Selectx("*", "TRAIN_ENROLLS", "where CLASS_ID = '" + Class_id + "' and tutee_id = '" + id + "'");
+                ResultSet rs1 = Selectx("COST_PER_ONE", "TRAINING", "where CLASS_ID = '" + Class_id + "'");
+
+                if (rs1.next())
+                    cost = rs1.getInt("COST_PER_ONE");
+                // 1. 멤버의 prepaid_money를 갱신하는 쿼리를 PreparedStatement로 작성
+                String updatePrepaidMoneyQuery = "UPDATE member SET prepaid_money = prepaid_money + ? WHERE id_number = ?";
+
+                // 2. PrepareStatement 객체 생성
+                try (PreparedStatement updatePrepaidMoneyStmt = ProjectMain.conn.prepareStatement(updatePrepaidMoneyQuery)) {
+                    // 3. PreparedStatement에 매개변수 할당
+                    updatePrepaidMoneyStmt.setInt(1, cost);
+                    updatePrepaidMoneyStmt.setString(2, id);
+
+                    // 4. prepaid_money 갱신 실행
+                    int updateResult = updatePrepaidMoneyStmt.executeUpdate();
+
+                    if (rs.next()) {
+                        String[] key = new String[2];
+                        key[0] = Class_id;
+                        key[1] = id;
+                        Deletex("TRAIN_ENROLLS", key);
+
+                        System.out.println("Training cancellation successful!");
+                        break;
+                    } else {
+                        System.out.println("You are not tutee of this training");
+                    }
+                }
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    private static void Apply_match(String id) throws SQLException, IOException {
+        try {
+            BufferedReader bf = new BufferedReader(new InputStreamReader(System.in));
+            int iter =0;
+            int cost = 0;
+            int maxNum= 0;
+            int nowNum = 0 ;
+            String sexCon;
+
+            while(true){
+                if (iter == 0)
+                    System.out.printf("Enter the Match_ID which you want to apply (Quit for q): ");
+                else
+                    System.out.printf("Re Enter the Match_ID which you want to apply (Quit for q):");
+                String match_id = bf.readLine();
+                if(match_id.toUpperCase().equals("Q"))
+                    break;
+                iter++;
+
+                ResultSet rs = Selectx("M.MATCH_ID, M.COST_PER_ONE, M.MAX_NUM, M.SEX_CONSTRAINT X.CNT",
+                        "MATCH M LEFT OUTER JOIN (SELECT MATCH_ID, COUNT(MEMBER_ID) AS CNT FROM MATCH_APP_MEMBER GROUP BY MATCH_ID) X ON M.MATCH_ID = X.MATCH_ID",
+                        "where M.Match_ID = '"+match_id+"'");
+
+                if(rs.next()) {
+                    cost = rs.getInt("COST_PER_ONE"); // cost를 동적으로 테이블에서 받아옴
+                    maxNum = rs.getInt("MAX_NUM"); // maxNum을 테이블로부터 동적으로 받아옴
+                    sexCon = rs.getString("SEX_CONSTRAINT");
+                    nowNum = rs.getInt("CNT");
+                } else {
+                    System.out.println("The match ID you entered does not exist.");
+                    continue;
+                }
+
+                rs = Selectx("PREPAID_MONEY", "MEMBER", "WHERE ID_NUMBER = '"+ id +"'");
+                rs.next();
+                int pm = rs.getInt(1);
+                if(pm < cost) {
+                    System.out.println("You don't have enough money, please Charge first");
+                    break;
+                }
+                if(nowNum == maxNum) {
+                    System.out.println("Match is already full");
+                    break;
+                }
+                rs = Selectx("SEX", "USER", "WHERE ID_NUMBER = '"+ id +"'");
+                rs.next();
+                String sex = rs.getString(1);
+                if(sex.equals(sexCon)){
+                    System.out.println("You cannot satisfy sex constraint");
+                    break;
+                }
+                // 1. 멤버의 prepaid_money를 갱신하는 쿼리를 PreparedStatement로 작성
+                String updatePrepaidMoneyQuery = "UPDATE member SET prepaid_money = prepaid_money - ? WHERE id_number = ?";
+
+                // 2. PrepareStatement 객체 생성
+                try (PreparedStatement updatePrepaidMoneyStmt = ProjectMain.conn.prepareStatement(updatePrepaidMoneyQuery)) {
+                    // 3. PreparedStatement에 매개변수 할당
+                    updatePrepaidMoneyStmt.setInt(1, cost);
+                    updatePrepaidMoneyStmt.setString(2, id);
+
+                    // 4. prepaid_money 갱신 실행
+                    int updateResult = updatePrepaidMoneyStmt.executeUpdate();
+
+                    if (updateResult > 0) {
+                        // 5. prepaid_money 갱신이 성공하면 MATCH_APP_MEMBER에 데이터 삽입
+                        String[] key = new String[3];
+                        key[0] = match_id;
+                        key[1] = id;
+                        key[2] = String.valueOf(cost);
+                        Insertx("MATCH_APP_MEMBER", key);
+
+                        System.out.println("Apply Match successful!");
+                        break;
+                    } else {
+                        System.out.println("Error applying match: Failed to update prepaid_money for member " + id);
+                    }
+                }
+            }
+        }catch (IOException | SQLException e) {
             System.err.println("Error Apply Match: " + e.getMessage());
         }
     }
 
-    private static void Cancel_match(String id) throws IOException {
+    private static void Cancel_match(String id) {
         try {
             BufferedReader bf = new BufferedReader(new InputStreamReader(System.in));
-            String cost = "6000";
-            int cost_i = 6000;
-            // cost는 어떻게 계산?
+            int cost = 0;
+            int iter = 0;
+            while (true) {
+                if (iter == 0)
+                    System.out.printf("Enter the Match_ID which you want to cancel (Quit for q): ");
+                else
+                    System.out.printf("Re Enter the Match_ID which you want to cancel (Quit for q):");
+                String match_id = bf.readLine();
+                if (match_id.toUpperCase().equals("Q"))
+                    break;
+                iter++;
+                ResultSet rs = Selectx("COST_PER_ONE", "MATCH", "where Match_ID = '" + match_id + "' and memver_id = '" + id + "'");
+                if (rs.next()) {
+                    cost = rs.getInt("COST_PER_ONE");
+                    // 1. 멤버의 prepaid_money를 갱신하는 쿼리를 PreparedStatement로 작성
+                    String updatePrepaidMoneyQuery = "UPDATE member SET prepaid_money = prepaid_money + ? WHERE id_number = ?";
 
-            // 1. 멤버의 prepaid_money를 갱신하는 쿼리를 PreparedStatement로 작성
-            String updatePrepaidMoneyQuery = "UPDATE member SET prepaid_money = prepaid_money + ? WHERE id_number = ?";
+                    // 2. PrepareStatement 객체 생성
+                    try (PreparedStatement updatePrepaidMoneyStmt = ProjectMain.conn.prepareStatement(updatePrepaidMoneyQuery)) {
+                        // 3. PreparedStatement에 매개변수 할당
+                        updatePrepaidMoneyStmt.setInt(1, cost);
+                        updatePrepaidMoneyStmt.setString(2, id);
 
-            // 2. PrepareStatement 객체 생성
-            try (PreparedStatement updatePrepaidMoneyStmt = ProjectMain.conn.prepareStatement(updatePrepaidMoneyQuery)) {
-                // 3. PreparedStatement에 매개변수 할당
-                updatePrepaidMoneyStmt.setInt(1, cost_i);
-                updatePrepaidMoneyStmt.setString(2, id);
+                        // 4. prepaid_money 갱신 실행
+                        int updateResult = updatePrepaidMoneyStmt.executeUpdate();
 
-                // 4. prepaid_money 갱신 실행
-                int updateResult = updatePrepaidMoneyStmt.executeUpdate();
-                ProjectMain.conn.commit();
-
-                if (updateResult > 0) {
-                    // 5. prepaid_money 갱신이 성공하면 MATCH_APP_MEMBER의 데이터 제거
-                    System.out.printf("Enter the Class_ID which you want to delete: ");
-                    String[] key = new String[2];
-                    key[0] = bf.readLine();
-                    key[1] = id;
-                    Deletex("MATCH_APP_MEMBER", key);
-                    System.out.println("Cancel Match successful!");
-                } else {
-                    System.out.println("Error applying match: Failed to update prepaid_money for member " + id);
+                        if (updateResult > 0) {
+                            // 5. prepaid_money 갱신이 성공하면 MATCH_APP_MEMBER의 데이터 제거
+                            String[] key = new String[2];
+                            key[0] = match_id;
+                            key[1] = id;
+                            Deletex("MATCH_APP_MEMBER", key);
+                            System.out.println("Cancel Match successful!");
+                        } else {
+                            System.out.println("Error applying match: Failed to update prepaid_money for member " + id);
+                        }
+                    }
                 }
+                else
+                    System.out.println("You are not the member of this match");
             }
-        } catch (IOException | SQLException e) {
-            System.err.println("Error Apply Match: " + e.getMessage());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 
     private static void Apply(String id) throws SQLException {
         try {
             BufferedReader bf = new BufferedReader(new InputStreamReader(System.in));
-            System.out.printf("Enter the Match_ID which you want to apply: ");
-            String match_id = bf.readLine();
+            int i = 0;
+            String match_id;
+            while (true) {
+                if (i == 0) {
+                    System.out.print("Enter the Match_ID which you want to apply (Enter 'Q' for Quit): ");
+                } else {
+                    System.out.print("Re-Enter the Match_ID which you want to apply (Enter 'Q' for Quit): ");
+                }
+                match_id = bf.readLine();
 
-            String updatePrepaidMoneyQuery = "UPDATE MATCH SET MANAGER_ID = ? WHERE MATCH_ID = ?";
-            PreparedStatement updatePrepaidMoneyStmt = ProjectMain.conn.prepareStatement(updatePrepaidMoneyQuery);
-            updatePrepaidMoneyStmt.setString(1, id);
-            updatePrepaidMoneyStmt.setString(2, match_id);
+                if (match_id.toUpperCase().equals("Q")) {
+                    break;
+                } else {
+                    // 수정된 SQL 쿼리 조건 구문
+                    ResultSet rs = Selectx("*", "MATCH", "WHERE MATCH_ID = '" + match_id + "' AND MANAGER_ID IS NULL");
 
-            updatePrepaidMoneyStmt.executeUpdate();
-            ProjectMain.conn.commit();
+                    // 무결성 제약 조건 위배 해결
+                    if (rs.next()) {
+                        String updatePrepaidMoneyQuery = "UPDATE MATCH SET MANAGER_ID = ? WHERE MATCH_ID = ?";
+                        try (PreparedStatement updatePrepaidMoneyStmt = ProjectMain.conn.prepareStatement(updatePrepaidMoneyQuery)) {
+                            updatePrepaidMoneyStmt.setString(1, id);
+                            updatePrepaidMoneyStmt.setString(2, match_id);
+                            updatePrepaidMoneyStmt.executeUpdate();
+                            ProjectMain.conn.commit();
 
-            System.out.println("Apply Match successful!");
-
+                            System.out.println("Apply Match successful!");
+                            break;
+                        }
+                    }
+                    else{
+                        System.out.println("This match is already applied!");
+                    }
+                    i++;
+                }
+            }
         } catch (IOException | SQLException e) {
             System.err.println("Error Apply Match: " + e.getMessage());
         }
     }
-    private static void Make_team(String id) throws IOException{
+    private static void Make_team(String id) throws IOException, SQLException {
         BufferedReader bf = new BufferedReader(new InputStreamReader(System.in));
         Random rand = new Random(System.currentTimeMillis());
         StringBuilder sb = new StringBuilder(); // class_id
-        sb.append("T").append(Math.abs(rand.nextInt() % 10)).append(Math.abs(rand.nextInt() % 10)).append(Math.abs(rand.nextInt() % 10));
-        sb.append("-").append(Math.abs(rand.nextInt() % 10)).append(Math.abs(rand.nextInt() % 10));
-        sb.append("-").append(Math.abs(rand.nextInt() % 10)).append(Math.abs(rand.nextInt() % 10)).append(Math.abs(rand.nextInt() % 10)).append(Math.abs(rand.nextInt() % 10));
-
+        while(true){
+            sb.append("T").append(Math.abs(rand.nextInt() % 10)).append(Math.abs(rand.nextInt() % 10)).append(Math.abs(rand.nextInt() % 10));
+            sb.append("-").append(Math.abs(rand.nextInt() % 10)).append(Math.abs(rand.nextInt() % 10));
+            sb.append("-").append(Math.abs(rand.nextInt() % 10)).append(Math.abs(rand.nextInt() % 10)).append(Math.abs(rand.nextInt() % 10)).append(Math.abs(rand.nextInt() % 10));
+            ResultSet rs= Selectx("*","TEAM","where team_id = '"+sb+"'");
+            if(rs.next())
+                sb.setLength(0);
+            else
+                break;
+        }
 
         try {
-
             String team_id = sb.toString();
 
             System.out.printf("Enter the Team name : ");
@@ -601,25 +827,31 @@ public class APPLICATION {
         }
         System.out.println("Team data inserted successfully!");
         System.out.println("Your Team ID is "+sb);
-
-
     }
     private static void Delete_team(String id) throws IOException {
         BufferedReader bf = new BufferedReader(new InputStreamReader(System.in));
+        int condition = 0;
         System.out.printf("Enter the Team_ID which you want to delete: ");
         String team_id = bf.readLine();
         try {
-            String[] key = new String[1];
-            key[0] = team_id;
-            Deletex("TEAM", key);
-            System.out.println("Delete team successfully!");
-            String[] key2 = new String[2];
-            key2[0] = team_id;
+            ResultSet rs = Selectx("COUNT(mem_id)","TEAM_MEM","where team_id = '" + team_id + "'");
             ResultSet rs1 = Selectx("mem_id", "TEAM_MEM", "where team_id = '" + team_id + "'");
-            while (rs1.next()) {
-                key2[1] = rs1.getString("mem_id");
-                Deletex("TEAM_MEM", key2);
+            condition = rs.getInt("COUNT(mem_id)");
+            if(condition ==1 ) {
+                if (rs1.next()) {
+                    String[] key = new String[1];
+                    key[0] = team_id;
+                    Deletex("TEAM", key);
+
+                    String[] key2 = new String[2];
+                    key2[0] = team_id;
+                    key2[1] = rs1.getString("mem_id");
+                    Deletex("TEAM_MEM", key2);
+                    System.out.println("Delete team successfully!");
+                }
             }
+            else
+                System.out.println("You can't delete it because members still exists in the team.");
         } catch (SQLException e) {
             System.err.println("Error deleting team tuple: " + e.getMessage());
         }
@@ -655,13 +887,15 @@ public class APPLICATION {
         }
     }
 
-    private static void Check(int opt, String id) {
+    private static void Check(int opt, String id) throws IOException {
         try {
+            BufferedReader bf = new BufferedReader(new InputStreamReader(System.in));
             switch (opt) {
-                case 1: // Member의 자기 정보 및 캐시, 평가 등급 정보 조회
-                    String attr = "U.*, M.PREPAID_MONEY, E.TIER";
-                    String tbl = "USERS U INNER JOIN MEMBER M ON U.ID_NUMBER = M.ID_NUMBER LEFT JOIN MEMBER_EVAL_VIEW E ON U.ID_NUMBER = E.MEM_ID";
-                    String where = "U.ID_NUMBER = '" + id + "'";
+                case 1: // Member의 자기 정보 및 캐시 정보 조회 P2_3.2.2
+
+                    String attr = "U.*, M.PREPAID_MONEY, MV.TIER";
+                    String tbl = "USERS U, MEMBER M, MEMBER_EVAL_VIEW MV";
+                    String where = "U.ID_NUMBER = M.ID_NUMBER and U.ID_NUMBER = MV.MEM_ID and U.ID_NUMBER = '" + id + "'";
                     ResultSet rsMember = SQLx.Selectx(attr, tbl, where, "");
                     if (rsMember.next()) {
                         System.out.println("Member Information:");
@@ -679,7 +913,7 @@ public class APPLICATION {
                     rsMember.close();
                     break;
 
-                case 2: // Manager의 자기 정보 조회
+                case 2: // Manager의 자기 정보 조회 P2_3.7.1
                     ResultSet rsManager = Selectx("*", "USERS U INNER JOIN MANAGER M ON U.ID_NUMBER = M.ID_NUMBER", "U.ID_NUMBER = '" + id + "'", "");
                     if (rsManager.next()) {
                         System.out.println("Manager Information:");
@@ -710,6 +944,57 @@ public class APPLICATION {
                     }
                     rsTeam.close();
                     break;
+
+                case 4: // Time/Place에 따른 Match 검색 P2_3.10.1
+                    System.out.printf("Enter the date you want to know: ");
+                    String time = bf.readLine();
+                    System.out.printf("Enter the place you want to know: ");
+                    String place = bf.readLine();
+                    String sqlQuery = "SELECT * FROM MATCH M, MATCH_EVAL_VIEW MV " +
+                            " WHERE M.MATCH_ID IN (" +
+                            "    (SELECT DISTINCT MATCH_ID " +
+                            "    FROM MATCH M1 " +
+                            "    WHERE M1.DATE_TIME = '" + time + "')" +
+                            "    INTERSECT " +
+                            "    (SELECT DISTINCT M2.MATCH_ID " +
+                            "    FROM MATCH M2 " +
+                            "    WHERE M2.PLACE_ID IN (" +
+                            "        SELECT FIELD_ID " +
+                            "        FROM FIELD " +
+                            "        WHERE FIELD.ADDRESS LIKE '%" + place + "%' ))" +
+                            ") AND M.MATCH_ID = MV.MATCH_ID";
+                    try{
+                        PreparedStatement stmt = ProjectMain.conn.prepareStatement(sqlQuery);
+                        ResultSet rsMatch = stmt.executeQuery();
+                        int row = 1;
+                        if(rsMatch.next()) { System.out.printf("%-3s | %-15s | %-15s | %-20s | %-5s | %-7s | %-15s | %-12s\n",
+                                "ROW", "MATCH_ID", "TIME", "PLACE", "TYPE", "MAX_NUM", "SEX_CONSTRAINT", "COST_PER_ONE");
+                            System.out.println("=================================================================================================================");
+
+                            System.out.printf("%-3d | %-15s | %-15s | %-20s | %-5s | %-7s | %-15s | %-12s\n",
+                                    row, rsMatch.getString(1), rsMatch.getDate(2).toString(), rsMatch.getString(3),
+                                    rsMatch.getString(4), rsMatch.getString(5), rsMatch.getString(6), rsMatch.getString(9));
+                            while (rsMatch.next()) {
+                                System.out.printf("%-3d | %-15s | %-15s | %-20s | %-5s | %-7s | %-15s | %-12s\n",
+                                        row, rsMatch.getString(1), rsMatch.getDate(2).toString(), rsMatch.getString(3),
+                                        rsMatch.getString(4), rsMatch.getString(5), rsMatch.getString(6), rsMatch.getString(9));
+
+                            }
+                        }
+                        else
+                            System.out.println("No match exists for the selected date and place.");
+                    } catch (SQLException e) {
+                        throw new RuntimeException(e);
+                    }
+                    break;
+                case 5: // P2_3.6.1 자기가 속한 Match의 list 출력
+                    String sqlQuery2 ="SELECT * " +
+                            " FROM MATCH\n" +
+                            " WHERE MATCH_ID IN ( " +
+                            " SELECT MATCH_ID" +
+                            " FROM MATCH_APP_MEMBER" +
+                            " WHERE MEMBER_ID = 'U673-07-7888')" +
+                            " ORDER BY DATE_TIME DESC";
             }
         } catch (SQLException e) {
             System.out.println("Database error occurred.");
