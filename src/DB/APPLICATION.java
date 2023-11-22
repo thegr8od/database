@@ -924,12 +924,34 @@ public class APPLICATION {
                         System.out.println("Year of Birth: " + rsManager.getString("YOB"));
                         System.out.println("Job: " + rsManager.getString("JOB"));
                         System.out.println("Bank Account: " + rsManager.getString("BANK_ACCOUNT"));
-                        // 다른 필요한 매니저 정보 추가
                     } else {
                         System.out.println("No manager information available.");
                     }
                     rsManager.close();
+
+                    // 매니저가 참여하고 있는 매치 정보 조회
+                    String matchQuery = "SELECT * FROM MATCH WHERE MANAGER_ID = '" + id + "'";
+                    try {
+                        PreparedStatement matchStmt = ProjectMain.conn.prepareStatement(matchQuery);
+                        ResultSet rsMatch = matchStmt.executeQuery();
+                        System.out.println("Manager's Matches:");
+                        while (rsMatch.next()) {
+                            System.out.println("Match ID: " + rsMatch.getString("MATCH_ID"));
+                            System.out.println("Date and Time: " + rsMatch.getDate("DATE_TIME").toString());
+                            System.out.println("Place ID: " + rsMatch.getString("PLACE_ID"));
+                            System.out.println("Type: " + rsMatch.getString("TYPE"));
+                            System.out.println("Max Participants: " + rsMatch.getInt("MAX_NUM"));
+                            System.out.println("Sex Constraint: " + rsMatch.getString("SEX_CONSTRAINT"));
+                            System.out.println("Wage: " + rsMatch.getInt("WAGE"));
+                            System.out.println("Cost per Person: " + rsMatch.getInt("COST_PER_ONE"));
+                            System.out.println("----------------------------------------------------");
+                        }
+                        rsMatch.close();
+                    } catch (SQLException e) {
+                        System.err.println("Error retrieving manager's match information: " + e.getMessage());
+                    }
                     break;
+
                 case 3: // Member가 속한 Team 조회 P2_3.7.2
                     String attrT = "T.TEAM_NAME, E.TEAM_TIER";
                     String atlT = "TEAM T INNER JOIN TEAM_MEM TM ON T.TEAM_ID = TM.TEAM_ID LEFT JOIN TEAM_EVAL_VIEW E ON T.TEAM_ID = E.TEAM_ID";
